@@ -1,0 +1,16 @@
+{
+  "name": "The New Seven Wonders",
+  "short_name": "7 Wonders",
+  "description": "An interactive 3D atlas of the New Seven Wonders of the World.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#101a33",
+  "theme_color": "#101a33",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

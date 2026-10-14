@@ -8,7 +8,8 @@
  *   2. load data/wonders.json and build the UI (plus tour + ambience)
  *   3. build the procedural stand-ins → dissolve-patch → sample clouds
  *   4. render live thumbnails of each model for the rail
- *   5. intro: dust condenses into the first wonder
+ *   5. intro: dust condenses into the first wonder; sky and light follow
+ *      the real sun at that wonder (sky.js), refreshed every minute
  *   6. in the background, swap in any Draco .glb models listed in the JSON
  *
  * Scene graph:
@@ -35,6 +36,7 @@ import { MorphController } from './MorphController.js';
 import { createUI } from './ui.js';
 import { createTour } from './tour.js';
 import { createAmbience } from './audio.js';
+import { sunAt, skyState, phaseOf, localTime, PREVIEWS, PREVIEW_ORDER } from './sky.js';
 
 const CONFIG = {
   dataUrl: './data/wonders.json',
@@ -48,6 +50,12 @@ const CONFIG = {
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const ui = createUI({ reducedMotion });
+const sky = createTimeOfDay();
+
+// Offline support (sw.js). ?nosw skips it, which is handy while editing files locally.
+if ('serviceWorker' in navigator && !new URLSearchParams(location.search).has('nosw')) {
+  addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch((e) => console.warn('[sw]', e)));
+}
 
 /* ------------------------------------------------------------ quality tiers */
 
@@ -261,7 +269,7 @@ async function boot() {
     scatter: scatterCloud(tier.particles, 7, mulberry32(3)),
     reducedMotion,
     onTheme: (theme, duration, entry) => {
-      applyTheme(theme, duration);
+      applyLook(entry.data, duration);
       if (entry) gsap.to(framing, { y: entry.frame.y, scale: fitScale(entry.frame), duration: duration * 1.1, ease: 'power2.inOut' });
     },
   });
@@ -277,22 +285,39 @@ async function boot() {
     if (phase === 'end') extras.tour.arrived();
   });
 
-  function applyTheme(theme, duration) {
-    gsap.to(document.documentElement, {
-      '--sky-top': theme.skyTop,
-      '--sky-bottom': theme.skyBottom,
-      '--accent': theme.accent,
-      duration,
-      ease: 'power2.inOut',
+  // The wonder's palette, shifted to the time of day there (live or a preview).
+  let shown = wonders[startIndex];
+  const KEY_DISTANCE = 13;
+  function applyLook(w, duration) {
+    shown = w;
+    const theme = w.theme;
+    const { look } = sky.show(w, duration);
+    const ease = 'power2.inOut';
+    tweenColor(key.color, look.key, duration);
+    gsap.to(key, { intensity: look.keyIntensity, duration, ease });
+    gsap.to(key.position, {
+      x: CONFIG.target.x + look.keyDir.x * KEY_DISTANCE,
+      y: CONFIG.target.y + look.keyDir.y * KEY_DISTANCE,
+      z: CONFIG.target.z + look.keyDir.z * KEY_DISTANCE,
+      duration, ease,
     });
-    const k = new THREE.Color(theme.key);
-    gsap.to(key.color, { r: k.r, g: k.g, b: k.b, duration });
+    tweenColor(hemi.color, look.hemiSky, duration);
+    gsap.to(hemi, { intensity: look.hemiIntensity, duration, ease });
+    gsap.to(rim, { intensity: look.rimIntensity, duration, ease });
+    gsap.to(scene, { environmentIntensity: look.envIntensity, duration, ease });
+    gsap.to(renderer, { toneMappingExposure: 0.88 + 0.17 * look.day, duration, ease });
     const a = new THREE.Color(theme.accent);
     gsap.to(ring.material.color, { r: a.r, g: a.g, b: a.b, duration });
     const p = new THREE.Color(theme.particle);
     gsap.to(dust.material.uniforms.uColor.value, { r: p.r, g: p.g, b: p.b, duration });
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.skyTop);
   }
+  sky.onChange = () => applyLook(shown, 1.6);
+  // Live mode: let the sun keep moving while you stay on one wonder.
+  setInterval(() => {
+    if (document.hidden) return;
+    if (sky.mode === 'live' && !controller.busy) applyLook(shown, 8);
+    else sky.show(shown, 0, { labelOnly: true });
+  }, 60000);
 
   /* --- layout / resize -------------------------------------------------- */
   let baseDistance = 10;
@@ -406,7 +431,7 @@ async function boot() {
 
   /* --- go --------------------------------------------------------------- */
   ui.setLoading(1, 'Ready');
-  applyTheme(wonders[startIndex].theme, 0.01);
+  applyLook(wonders[startIndex], 0.01);
   ui.hideLoader();
   controller.intro(startIndex);
   canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); ui.showNo3D(); });
@@ -494,15 +519,15 @@ function bootWithout3D(wonders, startIndex) {
     const prev = wonders[current];
     current = ((i % wonders.length) + wonders.length) % wonders.length;
     const w = wonders[current];
-    document.documentElement.style.setProperty('--sky-top', w.theme.skyTop);
-    document.documentElement.style.setProperty('--sky-bottom', w.theme.skyBottom);
-    document.documentElement.style.setProperty('--accent', w.theme.accent);
+    sky.show(w, 0.6);
     ui.travel(prev, w, 0.01);
     ui.enter(w, current, dir);
     history.replaceState(null, '', `#${w.id}`);
     extras.tour.arrived();
   };
   ui.init(wonders, extras.handlers({ select: (i) => show(i), next: () => show(current + 1), prev: () => show(current - 1, -1) }));
+  sky.onChange = () => sky.show(wonders[current], 1.2);
+  setInterval(() => { if (!document.hidden) sky.show(wonders[current], 4); }, 60000);
   ui.travel(null, wonders[current], 0.01);
   show(current);
   ui.hideLoader();
@@ -538,8 +563,47 @@ function createExtras(advance) {
       prev: user(nav.prev),
       tour: () => tour.toggle(),
       sound: () => ui.setSound(ambience.toggle()),
+      time: () => sky.cycle(),
     }),
   };
+}
+
+/* ------------------------------------------------------------ time of day */
+
+/**
+ * Which sky to show: "live" (the real sun at the wonder, now) or one of the
+ * preview presets. ?time=sunrise|midday|sunset|night starts on a preset.
+ * show() sets the CSS sky and the headline clock; main.js does the lights.
+ */
+function createTimeOfDay() {
+  const param = new URLSearchParams(location.search).get('time');
+  let mode = param in PREVIEWS ? param : 'live';
+  const self = {
+    onChange: null,
+    get mode() { return mode; },
+    cycle() {
+      mode = PREVIEW_ORDER[(PREVIEW_ORDER.indexOf(mode) + 1) % PREVIEW_ORDER.length];
+      self.onChange?.();
+    },
+    show(w, duration, { labelOnly = false } = {}) {
+      const sun = sunAt(w, mode);
+      const look = skyState(w.theme, sun);
+      ui.setTime({ local: localTime(w), phase: phaseOf(sun), mode, altitude: sun.altitude });
+      if (!labelOnly) {
+        gsap.to(document.documentElement, {
+          '--sky-top': look.skyTop,
+          '--sky-bottom': look.skyBottom,
+          '--accent': w.theme.accent,
+          '--stars': look.stars,
+          duration,
+          ease: 'power2.inOut',
+        });
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', look.skyTop);
+      }
+      return { sun, look };
+    },
+  };
+  return self;
 }
 
 /* ---------------------------------------------------------------- helpers */
@@ -559,6 +623,11 @@ function frameFor(root, frameScale = 1) {
 }
 
 const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
+
+function tweenColor(color, hex, duration) {
+  const c = new THREE.Color(hex);
+  gsap.to(color, { r: c.r, g: c.g, b: c.b, duration, ease: 'power2.inOut' });
+}
 
 /** Thin compass ring with degree ticks on the ground — the "survey" motif. */
 function createSurveyRing() {

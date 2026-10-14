@@ -113,6 +113,8 @@ index.html ── import map ─┬─ js/main.js            boot, renderer, lig
                           ├─ js/proceduralWonders.js  8 fallback models, merge-by-material, normalise
                           ├─ js/ui.js              DOM: rail, drawer, tabbed card, headline, coordinates, input
                           │   └─ js/globe.js       2D-canvas orthographic globe + great-circle arc
+                          │   └─ js/quiz.js        "Which wonder?" quiz dialog
+                          ├─ js/sky.js             solar position → sky colours, light, stars, local clock
                           ├─ js/tour.js            guided-tour timer
                           └─ js/audio.js           WebAudio wind bed + transition swell
 ```

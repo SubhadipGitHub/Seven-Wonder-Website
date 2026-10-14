@@ -4,7 +4,8 @@
     "selected": "2007-07-07",
     "note": "Announced in Lisbon on 7 July 2007 after a global public poll run by the New7Wonders Foundation. The Great Pyramid of Giza, the only surviving wonder of the ancient list, was given honorary status and appears here last, marked as honorary.",
     "modelNote": "Set model.glb (and optionally model.glbMobile) to Draco-compressed .glb paths to replace the procedural stand-in. model.usdz enables AR Quick Look on iOS. model.points may point to a Float32 xyz .bin cloud from tools/blender_export_wonders.py. model.rotationY (degrees) turns the model to face the camera; model.frameScale < 1 frames it closer.",
-    "contentNote": "Visitor figures change every year; each carries the year it refers to. Contested numbers are given as ranges or with 'about'. Each wonder lists its sources."
+    "contentNote": "Visitor figures change every year; each carries the year it refers to. Contested numbers are given as ranges or with 'about'. Each wonder lists its sources.",
+    "timeNote": "timeZone (IANA) drives the local clock; the sky and light follow the real sun position computed from coordinates and the current time."
   },
   "wonders": [
     {
@@ -16,6 +17,7 @@
         "lat": 40.4319,
         "lng": 116.5704
       },
+      "timeZone": "Asia/Shanghai",
       "built": "7th century BC – AD 1644",
       "builtBy": "Successive Chinese states and dynasties; most surviving masonry is Ming (1368–1644)",
       "unesco": 1987,
@@ -127,6 +129,12 @@
           "url": "https://www.britannica.com/topic/Great-Wall-of-China"
         }
       ],
+      "quizAliases": [
+        "Great Wall of China",
+        "Great Wall",
+        "the wall",
+        "The wall"
+      ],
       "theme": {
         "skyTop": "#16222e",
         "skyBottom": "#4d5f5c",
@@ -152,6 +160,7 @@
         "lat": 30.3285,
         "lng": 35.4444
       },
+      "timeZone": "Asia/Amman",
       "built": "c. 1st century BC – 1st century AD (peak)",
       "builtBy": "Nabataean Arabs",
       "unesco": 1985,
@@ -255,6 +264,14 @@
           "url": "https://www.britannica.com/place/Petra-ancient-city-Jordan"
         }
       ],
+      "quizAliases": [
+        "Petra",
+        "Treasury",
+        "Nabataeans",
+        "Nabataean",
+        "Al-Khazneh",
+        "Raqmu"
+      ],
       "theme": {
         "skyTop": "#26131d",
         "skyBottom": "#7a3a35",
@@ -280,6 +297,7 @@
         "lat": -22.9519,
         "lng": -43.2105
       },
+      "timeZone": "America/Sao_Paulo",
       "built": "1922 – 1931",
       "builtBy": "Engineer Heitor da Silva Costa, sculptor Paul Landowski, face by Gheorghe Leonida",
       "unesco": 2012,
@@ -384,6 +402,12 @@
           "url": "https://www.britannica.com/topic/Christ-the-Redeemer"
         }
       ],
+      "quizAliases": [
+        "Christ the Redeemer",
+        "Corcovado",
+        "the statue",
+        "The statue"
+      ],
       "theme": {
         "skyTop": "#0d1f38",
         "skyBottom": "#386784",
@@ -409,6 +433,7 @@
         "lat": -13.1631,
         "lng": -72.545
       },
+      "timeZone": "America/Lima",
       "built": "c. 1450",
       "builtBy": "The Inca, as a royal estate for the emperor Pachacuti",
       "unesco": 1983,
@@ -516,6 +541,12 @@
           "url": "https://www.britannica.com/place/Machu-Picchu"
         }
       ],
+      "quizAliases": [
+        "Machu Picchu",
+        "Huayna Picchu",
+        "Picchu",
+        "Inca"
+      ],
       "theme": {
         "skyTop": "#11221c",
         "skyBottom": "#486a55",
@@ -541,6 +572,7 @@
         "lat": 20.6843,
         "lng": -88.5678
       },
+      "timeZone": "America/Merida",
       "built": "c. AD 600 – 1200 (city's height)",
       "builtBy": "The Maya (Itza)",
       "unesco": 1988,
@@ -644,6 +676,12 @@
           "url": "https://www.britannica.com/place/Chichen-Itza"
         }
       ],
+      "quizAliases": [
+        "Chichén Itzá",
+        "El Castillo",
+        "Itza",
+        "Maya"
+      ],
       "theme": {
         "skyTop": "#20170e",
         "skyBottom": "#76562c",
@@ -669,6 +707,7 @@
         "lat": 41.8902,
         "lng": 12.4922
       },
+      "timeZone": "Europe/Rome",
       "built": "AD 70 – 80",
       "builtBy": "Flavian emperors Vespasian and Titus",
       "unesco": 1980,
@@ -784,6 +823,11 @@
           "url": "https://www.britannica.com/topic/Colosseum"
         }
       ],
+      "quizAliases": [
+        "Colosseum",
+        "Flavian Amphitheatre",
+        "amphitheatre"
+      ],
       "theme": {
         "skyTop": "#1c1828",
         "skyBottom": "#674b47",
@@ -809,6 +853,7 @@
         "lat": 27.1751,
         "lng": 78.0421
       },
+      "timeZone": "Asia/Kolkata",
       "built": "1632 – 1653",
       "builtBy": "Mughal emperor Shah Jahan; architect attributed to Ustad Ahmad Lahauri",
       "unesco": 1983,
@@ -922,6 +967,12 @@
           "url": "https://www.britannica.com/topic/Taj-Mahal"
         }
       ],
+      "quizAliases": [
+        "Taj Mahal",
+        "Mumtaz Mahal",
+        "Shah Jahan",
+        "Taj"
+      ],
       "theme": {
         "skyTop": "#1a162c",
         "skyBottom": "#80667c",
@@ -948,6 +999,7 @@
         "lat": 29.9792,
         "lng": 31.1342
       },
+      "timeZone": "Africa/Cairo",
       "built": "c. 2580 – 2560 BC",
       "builtBy": "Pharaoh Khufu, Fourth Dynasty; design attributed to his vizier Hemiunu",
       "unesco": 1979,
@@ -1052,6 +1104,13 @@
           "label": "Encyclopaedia Britannica — Pyramids of Giza",
           "url": "https://www.britannica.com/topic/Pyramids-of-Giza"
         }
+      ],
+      "quizAliases": [
+        "Great Pyramid of Giza",
+        "Great Pyramid",
+        "Khufu",
+        "pyramid",
+        "Pyramid"
       ],
       "theme": {
         "skyTop": "#1b1726",
