@@ -1,0 +1,283 @@
+{
+  "meta": {
+    "title": "The New Seven Wonders of the World",
+    "selected": "2007-07-07",
+    "note": "Announced in Lisbon on 7 July 2007 after a global public poll run by the New7Wonders Foundation. The Great Pyramid of Giza, the only surviving wonder of the ancient list, was given honorary status.",
+    "modelNote": "Set model.glb (and optionally model.glbMobile) to Draco-compressed .glb paths to replace the procedural stand-in. model.usdz enables AR Quick Look on iOS. model.points may point to a Float32 xyz .bin cloud from tools/blender_export_wonders.py. model.rotationY (degrees) turns the model to face the camera; model.frameScale < 1 frames it closer."
+  },
+  "wonders": [
+    {
+      "id": "great-wall",
+      "name": "Great Wall of China",
+      "country": "China",
+      "region": "Northern China — Mutianyu section",
+      "coordinates": {
+        "lat": 40.4319,
+        "lng": 116.5704
+      },
+      "built": "7th century BC – AD 1644",
+      "builtBy": "Successive Chinese states and dynasties; most surviving masonry is Ming (1368–1644)",
+      "unesco": 1987,
+      "stat": {
+        "value": "21,196 km",
+        "label": "of walls recorded in China's 2012 national survey"
+      },
+      "context": "Not one wall but a network of fortifications, built and rebuilt over two thousand years to guard northern frontiers against steppe incursions. Qin Shi Huang linked earlier walls after unifying China in 221 BC; the brick-and-stone ramparts most visitors walk today are largely Ming dynasty work.",
+      "highlights": [
+        "Ming builders bound bricks with a mortar of slaked lime and sticky-rice soup, whose amylopectin made it unusually strong and water-resistant.",
+        "Watchtowers were spaced within signalling distance, relaying warnings by smoke by day and fire by night.",
+        "The wall follows ridgelines deliberately, turning the terrain itself into part of the defence."
+      ],
+      "funFact": "It is not visible to the naked eye from the Moon — the myth predates spaceflight. China's first astronaut, Yang Liwei, said in 2003 that he could not make it out from orbit.",
+      "theme": {
+        "skyTop": "#16222e",
+        "skyBottom": "#4d5f5c",
+        "accent": "#d2b77c",
+        "particle": "#e7d3a1",
+        "key": "#ffe2b8"
+      },
+      "model": {
+        "glb": null,
+        "glbMobile": null,
+        "usdz": null,
+        "points": null,
+        "rotationY": 0,
+        "frameScale": 0.72
+      }
+    },
+    {
+      "id": "petra",
+      "name": "Petra",
+      "country": "Jordan",
+      "region": "Ma'an Governorate",
+      "coordinates": {
+        "lat": 30.3285,
+        "lng": 35.4444
+      },
+      "built": "c. 1st century BC – 1st century AD (peak)",
+      "builtBy": "Nabataean Arabs",
+      "unesco": 1985,
+      "stat": {
+        "value": "1.2 km",
+        "label": "length of the Siq, the narrow gorge that leads to the Treasury"
+      },
+      "context": "Capital of the Nabataean kingdom, Petra grew rich controlling caravan routes for incense, spices and textiles between Arabia, Egypt and the Mediterranean. Rome annexed it in AD 106; earthquakes and shifting trade routes later emptied it, and Swiss explorer Johann Ludwig Burckhardt described it to Europe in 1812.",
+      "highlights": [
+        "Façades such as Al-Khazneh were carved top-down directly out of the sandstone cliff rather than built from blocks.",
+        "Dams, cisterns and rock-cut channels captured flash floods and sustained a city of thousands in the desert.",
+        "The architecture fuses Nabataean tradition with Hellenistic columns, pediments and a central tholos."
+      ],
+      "funFact": "The stone urn crowning Al-Khazneh is pocked with bullet marks — Bedouin once shot at it, believing it hid a pharaoh's treasure. That legend is how 'The Treasury' got its name.",
+      "theme": {
+        "skyTop": "#26131d",
+        "skyBottom": "#7a3a35",
+        "accent": "#e8a284",
+        "particle": "#f2b393",
+        "key": "#ffcfa8"
+      },
+      "model": {
+        "glb": null,
+        "glbMobile": null,
+        "usdz": null,
+        "points": null,
+        "rotationY": 0,
+        "frameScale": 1
+      }
+    },
+    {
+      "id": "christ-the-redeemer",
+      "name": "Christ the Redeemer",
+      "country": "Brazil",
+      "region": "Corcovado, Rio de Janeiro",
+      "coordinates": {
+        "lat": -22.9519,
+        "lng": -43.2105
+      },
+      "built": "1922 – 1931",
+      "builtBy": "Engineer Heitor da Silva Costa, sculptor Paul Landowski, face by Gheorghe Leonida",
+      "unesco": 2012,
+      "stat": {
+        "value": "30 m",
+        "label": "statue height on an 8 m pedestal, 700 m above the city"
+      },
+      "context": "Conceived around Brazil's independence centenary in 1922 and funded largely by public donations, the statue was assembled on the summit of Corcovado from reinforced concrete and inaugurated on 12 October 1931. It overlooks Rio from the Tijuca forest.",
+      "highlights": [
+        "A reinforced-concrete core, engineered by Heitor da Silva Costa with Albert Caquot, carries arms that span 28 m.",
+        "The skin is a mosaic of thousands of small triangular soapstone tiles — durable and easy to work.",
+        "The head and hands were modelled in Paris by Paul Landowski, with the face by Romanian sculptor Gheorghe Leonida."
+      ],
+      "funFact": "Lightning strikes the statue several times a year. The archdiocese keeps a stock of matching soapstone on hand to repair chipped fingers and the head.",
+      "theme": {
+        "skyTop": "#0d1f38",
+        "skyBottom": "#386784",
+        "accent": "#bcd9d0",
+        "particle": "#d3ece4",
+        "key": "#fff1dc"
+      },
+      "model": {
+        "glb": null,
+        "glbMobile": null,
+        "usdz": null,
+        "points": null,
+        "rotationY": 0,
+        "frameScale": 1
+      }
+    },
+    {
+      "id": "machu-picchu",
+      "name": "Machu Picchu",
+      "country": "Peru",
+      "region": "Cusco Region, Urubamba valley",
+      "coordinates": {
+        "lat": -13.1631,
+        "lng": -72.545
+      },
+      "built": "c. 1450",
+      "builtBy": "The Inca, as a royal estate for the emperor Pachacuti",
+      "unesco": 1983,
+      "stat": {
+        "value": "2,430 m",
+        "label": "above sea level, on a saddle between two peaks"
+      },
+      "context": "Built as a royal estate for the Inca emperor Pachacuti in the mid-15th century, the citadel sits above the Urubamba River and was abandoned around the time of the Spanish conquest. The conquistadors never found it; it came to international attention in 1911 through Hiram Bingham, guided by local farmers who knew it well.",
+      "highlights": [
+        "Granite ashlar walls are cut so precisely that the blocks fit together without mortar.",
+        "Agricultural terraces double as retaining walls and drainage against heavy Andean rainfall.",
+        "A window of the Temple of the Sun frames the sunrise on the June solstice."
+      ],
+      "funFact": "Most of the engineering is out of sight: studies estimate around 60% of the construction lies underground, in foundations and crushed-rock drainage.",
+      "theme": {
+        "skyTop": "#11221c",
+        "skyBottom": "#486a55",
+        "accent": "#a9d6a8",
+        "particle": "#c4e8c0",
+        "key": "#fff0d2"
+      },
+      "model": {
+        "glb": null,
+        "glbMobile": null,
+        "usdz": null,
+        "points": null,
+        "rotationY": 0,
+        "frameScale": 1
+      }
+    },
+    {
+      "id": "chichen-itza",
+      "name": "Chichén Itzá",
+      "country": "Mexico",
+      "region": "Yucatán",
+      "coordinates": {
+        "lat": 20.6843,
+        "lng": -88.5678
+      },
+      "built": "c. AD 600 – 1200 (city's height)",
+      "builtBy": "The Maya (Itza)",
+      "unesco": 1988,
+      "stat": {
+        "value": "365",
+        "label": "steps across El Castillo's four stairways and top platform"
+      },
+      "context": "One of the largest Maya cities, Chichén Itzá was a political and economic centre of the northern Yucatán for some six centuries. Its architecture blends Maya and central Mexican styles around El Castillo, the pyramid-temple of the feathered serpent Kukulcán.",
+      "highlights": [
+        "Each of El Castillo's four stairways has 91 steps; with the top platform they total 365, one for each day of the solar year.",
+        "At the spring and autumn equinoxes, late-afternoon shadows form a serpent of light descending the north stairway.",
+        "An earlier, smaller pyramid is encased inside the one you see."
+      ],
+      "funFact": "Clap at the foot of El Castillo's stairway and the echo comes back as a chirp that many compare to the call of the sacred quetzal bird.",
+      "theme": {
+        "skyTop": "#20170e",
+        "skyBottom": "#76562c",
+        "accent": "#ebc47c",
+        "particle": "#f4d699",
+        "key": "#ffdcae"
+      },
+      "model": {
+        "glb": null,
+        "glbMobile": null,
+        "usdz": null,
+        "points": null,
+        "rotationY": 0,
+        "frameScale": 1
+      }
+    },
+    {
+      "id": "colosseum",
+      "name": "Colosseum",
+      "country": "Italy",
+      "region": "Rome",
+      "coordinates": {
+        "lat": 41.8902,
+        "lng": 12.4922
+      },
+      "built": "AD 70 – 80",
+      "builtBy": "Flavian emperors Vespasian and Titus",
+      "unesco": 1980,
+      "stat": {
+        "value": "50,000+",
+        "label": "spectators, by most estimates, at its height"
+      },
+      "context": "Commissioned by Vespasian on the site of Nero's palace lake and inaugurated by his son Titus in AD 80 with 100 days of games, the Flavian Amphitheatre staged gladiatorial combat, animal hunts and public spectacles for nearly four centuries.",
+      "highlights": [
+        "Eighty arched entrances, most of them numbered, moved huge crowds in and out quickly.",
+        "The hypogeum — a two-level warren of tunnels and lifts beneath the arena — raised animals and scenery through trapdoors.",
+        "A retractable awning, the velarium, shaded the seating and was rigged by sailors from the imperial fleet."
+      ],
+      "funFact": "The missing southern outer wall wasn't lost to war. Earthquakes, notably in 1349, brought it down, and the fallen travertine was quarried for buildings across Rome.",
+      "theme": {
+        "skyTop": "#1c1828",
+        "skyBottom": "#674b47",
+        "accent": "#e0bd90",
+        "particle": "#ecd0aa",
+        "key": "#ffd9b0"
+      },
+      "model": {
+        "glb": null,
+        "glbMobile": null,
+        "usdz": null,
+        "points": null,
+        "rotationY": 0,
+        "frameScale": 1
+      }
+    },
+    {
+      "id": "taj-mahal",
+      "name": "Taj Mahal",
+      "country": "India",
+      "region": "Agra, Uttar Pradesh",
+      "coordinates": {
+        "lat": 27.1751,
+        "lng": 78.0421
+      },
+      "built": "1632 – 1653",
+      "builtBy": "Mughal emperor Shah Jahan; architect attributed to Ustad Ahmad Lahauri",
+      "unesco": 1983,
+      "stat": {
+        "value": "20,000",
+        "label": "artisans, by contemporary accounts, worked on the complex"
+      },
+      "context": "Shah Jahan commissioned the Taj Mahal in 1632 as a tomb for his wife Mumtaz Mahal, who died in 1631. Set on the bank of the Yamuna, the complex balances Persian, Islamic and Indian traditions; the mausoleum was finished around 1643 and the wider complex about a decade later.",
+      "highlights": [
+        "White Makrana marble is inlaid with semi-precious stones in pietra dura, known locally as parchin kari.",
+        "The four minarets lean very slightly outward, so that in an earthquake they would fall away from the tomb.",
+        "The garden is a charbagh — four quarters divided by water channels — with the tomb at the far end rather than the centre."
+      ],
+      "funFact": "The complex is almost perfectly symmetrical. The one exception is Shah Jahan's own cenotaph, placed beside Mumtaz Mahal's after his death in 1666.",
+      "theme": {
+        "skyTop": "#1a162c",
+        "skyBottom": "#80667c",
+        "accent": "#f3e4d2",
+        "particle": "#fbefe2",
+        "key": "#ffe6d0"
+      },
+      "model": {
+        "glb": null,
+        "glbMobile": null,
+        "usdz": null,
+        "points": null,
+        "rotationY": 0,
+        "frameScale": 1
+      }
+    }
+  ]
+}

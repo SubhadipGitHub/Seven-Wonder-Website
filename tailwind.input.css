@@ -1,0 +1,6 @@
+/* Tailwind v4 entry. Rebuild with:
+   npx @tailwindcss/cli -i ./tailwind.input.css -o ./tailwind.css --minify
+   Sources are listed explicitly so the vendored three.js bundle isn't scanned. */
+@import "tailwindcss" source(none);
+@source "./index.html";
+@source "./js";

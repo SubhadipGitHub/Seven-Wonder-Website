@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>New Seven Wonders</title>
+  <meta name="description" content="Travel between the New Seven Wonders of the World in an interactive 3D atlas: Great Wall of China, Petra, Christ the Redeemer, Machu Picchu, Chichén Itzá, the Colosseum and the Taj Mahal." />
+  <meta name="theme-color" content="#101a33" />
+
+  <!-- Fonts: Bodoni Moda (display, atlas-plate didone) + Hanken Grotesk (text). Falls back to system serif/sans offline. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Hanken+Grotesk:wght@400;500;600&display=swap" />
+
+  <!--
+    Tailwind: tailwind.css is a precompiled v4 build of the classes used in this
+    project (see README → "Rebuilding Tailwind"). For quick prototyping you can
+    swap it for the browser CDN build instead:
+      <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3"></script>
+  -->
+  <link rel="stylesheet" href="./tailwind.css" />
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Local, vendored ES modules: runs offline and behind corporate proxies.
+       CDN equivalent: "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js", etc. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three/three.module.js",
+        "three/addons/": "./vendor/three/addons/",
+        "gsap": "./vendor/gsap/index.js"
+      }
+    }
+  </script>
+  <script type="module" src="./js/main.js"></script>
+</head>
+
+<body class="overflow-hidden text-[color:var(--paper)] antialiased">
+  <a class="skip-link" href="#card">Skip to details</a>
+
+  <!-- 3D stage (fixed, full-bleed, behind the UI) -->
+  <canvas id="scene" class="fixed inset-0 h-full w-full" role="img"
+          aria-label="Interactive 3D model of the selected wonder. Drag to rotate; pinch or Ctrl + scroll to zoom."></canvas>
+  <div id="no3d" class="no3d" hidden>
+    <p>The 3D view needs WebGL, which this browser has turned off. Everything else on the page still works.</p>
+  </div>
+
+  <!-- Loader: fades out as the first wonder condenses out of the dust -->
+  <div id="loader" class="loader fixed inset-0 z-50 grid place-items-center" aria-live="polite">
+    <div class="text-center">
+      <p class="loader-title">Gathering the wonders</p>
+      <div class="loader-bar mx-auto mt-5" aria-hidden="true"><span id="loader-fill"></span></div>
+      <p id="loader-status" class="loader-status mt-3">Preparing the stage</p>
+    </div>
+  </div>
+
+  <!-- Top bar -->
+  <header class="topbar fixed inset-x-0 top-0 z-30 flex items-start justify-between gap-4 px-5 pt-5 md:px-10 md:pt-8">
+    <p class="brand">
+      <span class="brand-name">The New Seven Wonders</span>
+      <span class="brand-sub hidden sm:block">An atlas you can turn in your hands</span>
+    </p>
+    <div class="flex items-center gap-4">
+      <p class="counter" aria-hidden="true"><span id="counter-now">1</span><span class="counter-of"> of 7</span></p>
+      <button id="menu-btn" class="icon-btn lg:hidden" aria-label="Open the list of wonders" aria-controls="drawer" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="hud" class="pointer-events-none fixed inset-0 z-20">
+    <!-- Headline: the wonder's name and where on Earth it is -->
+    <section id="headline" class="headline pointer-events-auto" aria-labelledby="wonder-name">
+      <h1 id="wonder-name" class="wonder-name">Great Wall of China</h1>
+      <p class="coords" aria-label="Coordinates">
+        <span id="coord-lat" class="coord">40.4319° N</span>
+        <span id="coord-lng" class="coord">116.5704° E</span>
+      </p>
+      <p id="wonder-place" class="place">Northern China, China</p>
+      <div class="mobile-steps lg:hidden">
+        <button class="icon-btn" data-prev aria-label="Previous wonder">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon-btn" data-next aria-label="Next wonder">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Information card: side panel on desktop, bottom sheet on mobile -->
+    <aside id="card" class="card glass pointer-events-auto" aria-labelledby="wonder-name" tabindex="-1">
+      <button id="sheet-toggle" class="sheet-toggle lg:hidden" aria-expanded="false" aria-controls="card-scroll">
+        <span class="sheet-handle" aria-hidden="true"></span>
+        <span id="sheet-label">Show details</span>
+      </button>
+      <div id="card-scroll" class="card-scroll" data-scrollable>
+        <div id="card-inner" class="card-inner">
+          <dl class="facts">
+            <div><dt>Built</dt><dd id="f-built"></dd></div>
+            <div><dt>Built by</dt><dd id="f-by"></dd></div>
+            <div><dt>World Heritage since</dt><dd id="f-unesco"></dd></div>
+          </dl>
+          <p class="stat"><span id="stat-value" class="stat-value"></span> <span id="stat-label"></span></p>
+          <p id="f-context" class="context"></p>
+          <h2 class="card-h">What to look for</h2>
+          <ul id="f-highlights" class="highlights"></ul>
+          <div class="actions">
+            <button id="btn-fact" class="btn btn-primary" aria-expanded="false" aria-controls="fact">Show a fun fact</button>
+            <button id="btn-ar" class="btn btn-ghost">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zm0 0v9m0 0l8-4.5M12 12l-8-4.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg>
+              View in AR
+            </button>
+          </div>
+          <p id="ar-note" class="note" role="status" hidden></p>
+          <div id="fact" class="fact" hidden>
+            <p id="f-fact"></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Desktop thumbnail rail -->
+  <nav id="rail" class="rail fixed inset-x-0 bottom-0 z-30 hidden lg:flex" aria-label="Choose a wonder">
+    <button class="icon-btn" data-prev aria-label="Previous wonder">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <ol id="rail-list" class="rail-list"></ol>
+    <button class="icon-btn" data-next aria-label="Next wonder">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </nav>
+
+  <!-- Mobile navigation drawer -->
+  <div id="drawer" class="drawer fixed inset-0 z-40" hidden>
+    <div class="drawer-scrim" data-close></div>
+    <nav class="drawer-panel glass" aria-label="All wonders">
+      <div class="flex items-center justify-between">
+        <p class="drawer-title">Choose a wonder</p>
+        <button class="icon-btn" data-close aria-label="Close the list">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ol id="drawer-list" class="drawer-list"></ol>
+    </nav>
+  </div>
+
+  <p id="hint" class="hint fixed z-20 hidden lg:block">Scroll or use the arrow keys to travel. Drag to turn the model, Ctrl + scroll to zoom.</p>
+  <p id="sr-status" class="sr-only" aria-live="polite"></p>
+
+  <noscript>
+    <p class="noscript">This atlas needs JavaScript to show the 3D models.</p>
+  </noscript>
+</body>
+</html>
