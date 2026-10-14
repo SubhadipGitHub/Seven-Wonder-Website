@@ -2,58 +2,89 @@
  * ui.js
  * ---------------------------------------------------------------------------
  * DOM side of the atlas: builds the thumbnail rail and mobile drawer, fills
- * the information card, animates the headline and the travelling
- * coordinates, and turns input (wheel, keys, swipes) into navigation intents.
+ * the tabbed information card, animates the headline, the travelling
+ * coordinates and the mini globe, and turns input (wheel, keys, swipes) into
+ * navigation intents.
  *
  * It never touches Three.js. MorphController calls leave()/travel()/enter()
  * at the right moments of each transition; main.js wires the intents.
  * ---------------------------------------------------------------------------
  */
 import gsap from 'gsap';
+import { createGlobe } from './globe.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+const TABS = ['overview', 'timeline', 'facts', 'visit'];
 
 export function createUI({ reducedMotion = false } = {}) {
   const el = {
     loader: $('#loader'),
     loaderFill: $('#loader-fill'),
     loaderStatus: $('#loader-status'),
+    loaderFact: $('#loader-fact'),
     name: $('#wonder-name'),
+    badge: $('#wonder-badge'),
     lat: $('#coord-lat'),
     lng: $('#coord-lng'),
     place: $('#wonder-place'),
-    counter: $('#counter-now'),
+    distance: $('#wonder-distance'),
+    counterNow: $('#counter-now'),
+    counterOf: $('#counter-of'),
     card: $('#card'),
     cardInner: $('#card-inner'),
     cardScroll: $('#card-scroll'),
+    tablist: $('[role="tablist"]'),
     built: $('#f-built'),
     by: $('#f-by'),
     unesco: $('#f-unesco'),
-    statValue: $('#stat-value'),
-    statLabel: $('#stat-label'),
+    unescoNote: $('#f-unesco-note'),
+    stats: $('#f-stats'),
     context: $('#f-context'),
     highlights: $('#f-highlights'),
-    factBtn: $('#btn-fact'),
+    materialsWrap: $('#f-materials-wrap'),
+    materials: $('#f-materials'),
+    timeline: $('#f-timeline'),
     fact: $('#fact'),
+    factKind: $('#fact-kind'),
     factText: $('#f-fact'),
+    factTruth: $('#fact-truth'),
+    factCount: $('#fact-count'),
+    factBtn: $('#btn-fact'),
+    visit: $('#f-visit'),
+    visitNote: $('#f-visit-note'),
+    sources: $('#f-sources'),
+    shareBtn: $('#btn-share'),
+    shareNote: $('#share-note'),
     arBtn: $('#btn-ar'),
     arNote: $('#ar-note'),
     railList: $('#rail-list'),
     drawer: $('#drawer'),
     drawerList: $('#drawer-list'),
     menuBtn: $('#menu-btn'),
+    tourBtn: $('#btn-tour'),
+    soundBtn: $('#btn-sound'),
+    helpBtn: $('#btn-help'),
+    help: $('#help'),
+    helpMax: $('#help-max'),
     sheetToggle: $('#sheet-toggle'),
     sheetLabel: $('#sheet-label'),
     status: $('#sr-status'),
     headline: $('#headline'),
+    globe: $('#globe'),
     no3d: $('#no3d'),
   };
 
   let wonders = [];
-  let handlers = { select() {}, next() {}, prev() {} };
+  let handlers = { select() {}, next() {}, prev() {}, tour() {}, sound() {} };
   let currentData = null;
-  const coordState = { lat: 0, lng: 0 };
+  let previousData = null;
+  let tab = 'overview';
+  let factIndex = 0;
+  let globe = null;
+  let shareTimer = 0;
+  const coordState = { lat: 0, lng: 0, t: 1 };
 
   /* ------------------------------------------------------------ building */
 
@@ -61,17 +92,18 @@ export function createUI({ reducedMotion = false } = {}) {
     wonders = list;
     handlers = { ...handlers, ...h };
     const thumbVars = (w) => `--t-top:${w.theme.skyTop};--t-bottom:${w.theme.skyBottom}`;
+    const tag = (w) => (w.honorary ? '<span class="thumb-tag">Honorary</span>' : '');
 
     el.railList.innerHTML = list.map((w, i) => `
-      <li><button class="thumb" data-index="${i}" aria-label="${escapeHTML(w.name)}, ${escapeHTML(w.country)}">
+      <li${w.honorary ? ' class="is-honorary"' : ''}><button class="thumb" data-index="${i}" aria-label="${escapeHTML(w.name)}, ${escapeHTML(w.country)}${w.honorary ? ' (honorary)' : ''}">
         <span class="thumb-img" style="${thumbVars(w)}"></span>
-        <span>${escapeHTML(w.name)}</span>
+        <span>${escapeHTML(w.name)}${tag(w)}</span>
       </button></li>`).join('');
 
     el.drawerList.innerHTML = list.map((w, i) => `
       <li><button class="drawer-item" data-index="${i}">
         <span class="thumb-img" style="${thumbVars(w)}"></span>
-        <span><strong>${escapeHTML(w.name)}</strong><span class="sub">${escapeHTML(w.country)}</span></span>
+        <span><strong>${escapeHTML(w.name)}</strong><span class="sub">${escapeHTML(w.country)}${w.honorary ? ' · honorary' : ''}</span></span>
       </button></li>`).join('');
 
     $$('[data-index]').forEach((b) =>
@@ -83,12 +115,22 @@ export function createUI({ reducedMotion = false } = {}) {
     $$('[data-next]').forEach((b) => b.addEventListener('click', () => handlers.next()));
     $$('[data-prev]').forEach((b) => b.addEventListener('click', () => handlers.prev()));
 
-    el.factBtn.addEventListener('click', toggleFact);
+    el.factBtn.addEventListener('click', () => showFact(factIndex + 1, true));
     el.arBtn.addEventListener('click', openAR);
+    el.shareBtn.addEventListener('click', share);
     el.menuBtn.addEventListener('click', openDrawer);
+    el.tourBtn.addEventListener('click', () => handlers.tour());
+    el.soundBtn.addEventListener('click', () => handlers.sound());
+    el.helpBtn.addEventListener('click', openHelp);
+    $$('[data-help-close]', el.help).forEach((b) => b.addEventListener('click', () => el.help.close()));
+    el.help.addEventListener('click', (e) => { if (e.target === el.help) el.help.close(); }); // backdrop
     $$('[data-close]', el.drawer).forEach((b) => b.addEventListener('click', closeDrawer));
     el.sheetToggle.addEventListener('click', () => setSheet(!el.card.classList.contains('is-expanded')));
 
+    el.helpMax.textContent = String(Math.min(9, list.length));
+    if (el.globe.getContext) globe = createGlobe(el.globe, { points: list.map((w) => w.coordinates) });
+
+    bindTabs();
     bindInput();
   }
 
@@ -108,6 +150,15 @@ export function createUI({ reducedMotion = false } = {}) {
   function hideLoader() { el.loader.classList.add('is-done'); }
   function showNo3D() { el.no3d.hidden = false; }
 
+  /** A random plain fact (not a myth) under the loader bar while models build. */
+  function showLoaderFact(list) {
+    const pool = list.flatMap((w) => factsOf(w).filter((f) => f.type !== 'myth').map((f) => ({ w, f })));
+    if (!pool.length) return;
+    const { w, f } = pool[Math.floor(Math.random() * pool.length)];
+    el.loaderFact.textContent = `${w.name}: ${f.text}`;
+    if (!reducedMotion) gsap.fromTo(el.loaderFact, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.3 });
+  }
+
   /* --------------------------------------------------- transition phases */
 
   /** Old content exits in the direction of travel. */
@@ -115,46 +166,71 @@ export function createUI({ reducedMotion = false } = {}) {
     if (reducedMotion) return gsap.to([el.cardInner, el.name], { opacity: 0, duration: 0.2 });
     const chars = $$('.char', el.name);
     gsap.to(chars, { yPercent: -110, duration: 0.45, ease: 'power3.in', stagger: { each: 0.012, from: dir > 0 ? 'start' : 'end' } });
-    gsap.to([el.place], { opacity: 0, duration: 0.3 });
+    gsap.to([el.place, el.distance, el.badge], { opacity: 0, duration: 0.3 });
     gsap.to(el.cardInner, { opacity: 0, x: -24 * dir, duration: 0.4, ease: 'power2.in' });
   }
 
   /** New content enters. */
   function enter(data, index, dir = 1) {
+    previousData = currentData;
     currentData = data;
     fillCard(data);
     setName(data.name);
+    el.badge.hidden = !data.honorary;
     el.place.textContent = `${data.region}, ${data.country}`;
-    el.counter.textContent = String(index + 1);
-    el.status.textContent = `Now showing ${data.name}, ${data.country}.`;
+    setDistance();
+    setCounter(index);
+    el.status.textContent = `Now showing ${data.name}, ${data.country}${data.honorary ? ' (honorary wonder)' : ''}.`;
     setActive(index);
     el.cardScroll.scrollTop = 0;
 
     if (reducedMotion) {
-      gsap.set([el.cardInner, el.name, el.place], { opacity: 1, x: 0 });
+      gsap.set([el.cardInner, el.name, el.place, el.distance, el.badge], { opacity: 1, x: 0 });
       return;
     }
     gsap.set(el.name, { opacity: 1 });
     gsap.fromTo($$('.char', el.name), { yPercent: 110 }, {
       yPercent: 0, duration: 0.9, ease: 'power4.out', stagger: { each: 0.018, from: dir > 0 ? 'start' : 'end' },
     });
-    gsap.fromTo(el.place, { opacity: 0 }, { opacity: 1, duration: 0.6, delay: 0.35 });
+    gsap.fromTo([el.place, el.distance, el.badge], { opacity: 0 }, { opacity: 1, duration: 0.6, delay: 0.35 });
     gsap.fromTo(el.cardInner, { opacity: 0, x: 28 * dir }, { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' });
-    gsap.fromTo($$('li', el.highlights), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.07, delay: 0.25, ease: 'power2.out' });
+    revealPanel(0.25);
   }
 
-  /** Coordinates count from the old location to the new one. */
+  function setCounter(index) {
+    // The seven are numbered; the honorary wonder isn't one of them.
+    const seven = wonders.filter((w) => !w.honorary).length;
+    const data = wonders[index];
+    if (data?.honorary) {
+      el.counterNow.textContent = 'Honorary';
+      el.counterOf.textContent = '';
+    } else {
+      el.counterNow.textContent = String(wonders.slice(0, index + 1).filter((w) => !w.honorary).length);
+      el.counterOf.textContent = ` of ${seven}`;
+    }
+  }
+
+  /** Coordinates count from the old location to the new one; the globe follows the great circle. */
   function travel(fromData, toData, duration = 2) {
     const from = fromData ? fromData.coordinates : { lat: 0, lng: 0 };
+    const index = wonders.indexOf(toData);
     gsap.killTweensOf(coordState);
     if (!fromData) Object.assign(coordState, from);
+    coordState.t = 0;
+    const start = { lat: coordState.lat, lng: coordState.lng };
     gsap.to(coordState, {
       lat: toData.coordinates.lat,
       lng: toData.coordinates.lng,
+      t: 1,
       duration,
       ease: 'power2.inOut',
-      onUpdate: renderCoords,
+      onUpdate: () => {
+        renderCoords();
+        if (fromData) globe?.travel(start, toData.coordinates, coordState.t, index);
+      },
+      onComplete: () => { if (!fromData) globe?.show(toData.coordinates, index); },
     });
+    if (!fromData) globe?.show(toData.coordinates, index);
     renderCoords();
   }
 
@@ -178,40 +254,161 @@ export function createUI({ reducedMotion = false } = {}) {
       .join(' ');
   }
 
+  function setDistance() {
+    const from = previousData;
+    el.distance.hidden = !from;
+    if (from) el.distance.textContent = `${fmtKm(haversineKm(from.coordinates, currentData.coordinates))} from ${from.name}`;
+  }
+
+  /* --------------------------------------------------------------- card */
+
   function fillCard(d) {
+    // Overview
     el.built.textContent = d.built;
     el.by.textContent = d.builtBy;
     el.unesco.textContent = String(d.unesco);
-    el.statValue.textContent = d.stat.value;
-    el.statLabel.textContent = d.stat.label;
+    el.unescoNote.hidden = !d.unescoNote;
+    el.unescoNote.textContent = d.unescoNote || '';
+    const stats = d.keyStats?.length ? d.keyStats : d.stat ? [d.stat] : [];
+    el.stats.innerHTML = stats.map((s) => `
+      <li><span class="stat-value">${escapeHTML(s.value)}</span><span class="stat-label">${escapeHTML(s.label)}</span></li>`).join('');
     el.context.textContent = d.context;
     el.highlights.innerHTML = d.highlights.map((h) => `<li>${escapeHTML(h)}</li>`).join('');
-    el.factText.textContent = d.funFact;
-    el.fact.hidden = true;
-    el.factBtn.setAttribute('aria-expanded', 'false');
-    el.factBtn.textContent = 'Show a fun fact';
+    el.materialsWrap.hidden = !d.materials?.length;
+    el.materials.innerHTML = (d.materials || []).map((m) => `<li>${escapeHTML(m)}</li>`).join('');
+
+    // Timeline
+    setTabAvailable('timeline', !!d.timeline?.length);
+    el.timeline.innerHTML = (d.timeline || []).map((t) => `
+      <li><span class="tl-year">${escapeHTML(t.year)}</span><span class="tl-event">${escapeHTML(t.event)}</span></li>`).join('');
+
+    // Facts
+    factIndex = 0;
+    showFact(0, false);
+
+    // Visit
+    const v = d.visit || {};
+    const rows = [];
+    if (v.nearestCity) rows.push(['Getting there', v.nearestCity]);
+    if (v.bestTime) rows.push(['Best time', v.bestTime]);
+    if (v.visitors) rows.push(['Visitors', `${v.visitors.value}${v.visitors.year ? ` (${v.visitors.year})` : ''}`]);
+    if (previousData) rows.push([`From ${previousData.name}`, `${fmtKm(haversineKm(previousData.coordinates, d.coordinates))} as the crow flies`]);
+    el.visit.innerHTML = rows.map(([k, val]) => `<div><dt>${escapeHTML(k)}</dt><dd>${escapeHTML(val)}</dd></div>`).join('');
+    el.visitNote.hidden = !v.note;
+    el.visitNote.textContent = v.note || '';
+    el.sources.innerHTML = (d.sources || []).map((s) =>
+      `<li><a href="${escapeHTML(s.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(s.label)}</a></li>`).join('');
+    setTabAvailable('visit', rows.length > 0 || !!d.sources?.length);
+    if ($(`#tab-${tab}`).hidden) selectTab('overview', { focus: false, animate: false });
+
+    // Actions: AR only when there's a model file to place.
+    const m = d.model || {};
+    el.arBtn.hidden = !(m.glb || m.usdz);
     el.arNote.hidden = true;
+    el.shareNote.hidden = true;
+  }
+
+  function setTabAvailable(name, ok) {
+    $(`#tab-${name}`).hidden = !ok;
+  }
+
+  /* -------------------------------------------------------------- facts */
+
+  /** Facts list with fallback to the old single funFact field. */
+  function factsOf(d) {
+    if (d.facts?.length) return d.facts;
+    return d.funFact ? [{ type: 'fact', text: d.funFact }] : [];
+  }
+
+  function showFact(i, animate) {
+    const list = factsOf(currentData);
+    setTabAvailable('facts', list.length > 0);
+    if (!list.length) return;
+    factIndex = ((i % list.length) + list.length) % list.length;
+    const f = list[factIndex];
+    const apply = () => {
+      const myth = f.type === 'myth';
+      el.fact.classList.toggle('is-myth', myth);
+      el.factKind.textContent = myth ? 'Myth' : 'Did you know?';
+      el.factText.textContent = f.text;
+      el.factTruth.hidden = !(myth && f.truth);
+      el.factTruth.innerHTML = myth && f.truth ? `<strong>Actually:</strong> ${escapeHTML(f.truth)}` : '';
+      el.factCount.textContent = `${factIndex + 1} of ${list.length}`;
+    };
+    el.factBtn.hidden = list.length < 2;
+    if (!animate || reducedMotion) return apply();
+    gsap.to(el.fact, {
+      opacity: 0, y: -6, duration: 0.18, ease: 'power1.in',
+      onComplete: () => { apply(); gsap.fromTo(el.fact, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }); },
+    });
+  }
+
+  /* --------------------------------------------------------------- tabs */
+
+  function bindTabs() {
+    $$('[role="tab"]', el.tablist).forEach((b) => b.addEventListener('click', () => {
+      selectTab(b.dataset.tab, { focus: false });
+      if (!isDesktop() && !el.card.classList.contains('is-expanded')) setSheet(true);
+    }));
+    el.tablist.addEventListener('keydown', (e) => {
+      const visible = TABS.filter((t) => !$(`#tab-${t}`).hidden);
+      const i = visible.indexOf(tab);
+      let next = null;
+      if (e.key === 'ArrowRight') next = visible[(i + 1) % visible.length];
+      else if (e.key === 'ArrowLeft') next = visible[(i - 1 + visible.length) % visible.length];
+      else if (e.key === 'Home') next = visible[0];
+      else if (e.key === 'End') next = visible[visible.length - 1];
+      if (!next) return;
+      e.preventDefault();
+      e.stopPropagation(); // arrows here switch tabs, not wonders
+      selectTab(next, { focus: true });
+    });
+  }
+
+  function selectTab(name, { focus = false, animate = true } = {}) {
+    tab = name;
+    for (const t of TABS) {
+      const b = $(`#tab-${t}`), p = $(`#panel-${t}`), on = t === name;
+      b.setAttribute('aria-selected', String(on));
+      b.tabIndex = on ? 0 : -1;
+      p.hidden = !on;
+    }
+    if (focus) $(`#tab-${name}`).focus();
+    el.cardScroll.scrollTop = 0;
+    if (animate) revealPanel(0);
+  }
+
+  function revealPanel(delay) {
+    if (reducedMotion) return;
+    const items = $$(`#panel-${tab} :is(.facts > div, .stats li, .highlights li, .timeline li, .fact-card, .tags, .sources li, .context)`);
+    gsap.fromTo(items, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.045, delay, ease: 'power2.out', overwrite: true });
   }
 
   function setActive(index) {
     $$('[data-index]').forEach((b) => b.setAttribute('aria-current', String(Number(b.dataset.index) === index)));
   }
 
-  /* ----------------------------------------------------- fun fact & AR */
+  /* ------------------------------------------------------ share & AR */
 
-  function toggleFact() {
-    const open = el.fact.hidden;
-    el.fact.hidden = !open;
-    el.factBtn.setAttribute('aria-expanded', String(open));
-    el.factBtn.textContent = open ? 'Hide the fun fact' : 'Show a fun fact';
-    if (open && !reducedMotion) {
-      gsap.fromTo(el.fact, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' });
-      el.fact.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  async function share() {
+    const d = currentData;
+    const url = location.href;
+    const text = `${d.name}, ${d.country} — in the New Seven Wonders atlas.`;
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+      try { await navigator.share({ title: d.name, text, url }); return; }
+      catch (e) { if (e.name === 'AbortError') return; }
     }
+    let msg = 'Link copied to the clipboard.';
+    try { await navigator.clipboard.writeText(url); }
+    catch { msg = `Copy this link: ${url}`; }
+    el.shareNote.textContent = msg;
+    el.shareNote.hidden = false;
+    clearTimeout(shareTimer);
+    shareTimer = setTimeout(() => { el.shareNote.hidden = true; }, 4000);
   }
 
   /**
-   * "View in AR":
+   * "View in AR" (only shown when the wonder has a model file):
    *  - iOS Safari with a .usdz → AR Quick Look
    *  - Android with a .glb     → Google Scene Viewer
    *  - otherwise explain what's needed instead of failing silently.
@@ -242,11 +439,27 @@ export function createUI({ reducedMotion = false } = {}) {
       return;
     }
     let msg;
-    if (!m.glb && !m.usdz) msg = 'AR needs a 3D model file for this wonder. The model on screen is a lightweight stand-in, so it can’t be placed in your room yet.';
-    else if (isIOS && !m.usdz) msg = 'On iPhone and iPad, AR needs a .usdz version of this model.';
+    if (isIOS && !m.usdz) msg = 'On iPhone and iPad, AR needs a .usdz version of this model.';
     else msg = 'Open this page on an AR-capable phone or tablet to place the model in your room.';
     el.arNote.textContent = msg;
     el.arNote.hidden = false;
+  }
+
+  /* ------------------------------------------------ topbar toggles */
+
+  function setTour(on) {
+    el.tourBtn.setAttribute('aria-pressed', String(on));
+    el.tourBtn.setAttribute('aria-label', on ? 'Pause the guided tour' : 'Start the guided tour');
+    el.status.textContent = on ? 'Guided tour started.' : 'Guided tour paused.';
+  }
+  function setSound(on) {
+    el.soundBtn.setAttribute('aria-pressed', String(on));
+    el.soundBtn.setAttribute('aria-label', on ? 'Turn ambient sound off' : 'Turn ambient sound on');
+  }
+  function openHelp() {
+    if (el.help.open) return el.help.close();
+    closeDrawer();
+    el.help.showModal();
   }
 
   /* --------------------------------------------------- drawer & sheet */
@@ -273,6 +486,7 @@ export function createUI({ reducedMotion = false } = {}) {
     el.sheetLabel.textContent = open ? 'Hide details' : 'Show details';
     if (!open) el.cardScroll.scrollTop = 0;
   }
+  const isDesktop = () => innerWidth >= 1024;
 
   /* ------------------------------------------------------------- input */
 
@@ -285,7 +499,7 @@ export function createUI({ reducedMotion = false } = {}) {
       if (e.ctrlKey) return;
       const scroller = e.target.closest?.('[data-scrollable]');
       if (scroller && scroller.scrollHeight > scroller.clientHeight + 2) return;
-      if (e.target.closest?.('#drawer')) return;
+      if (e.target.closest?.('#drawer, #help')) return;
       e.preventDefault();
       e.stopPropagation(); // keep OrbitControls from zooming on plain scroll
       const now = performance.now();
@@ -299,11 +513,18 @@ export function createUI({ reducedMotion = false } = {}) {
     }, { passive: false, capture: true });
 
     window.addEventListener('keydown', (e) => {
-      if (e.target.matches?.('input, textarea')) return;
+      if (e.target.matches?.('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (el.help.open) return; // the dialog handles its own Escape
+      if (e.target.closest?.('[role="tablist"]') && /^Arrow|^Home$|^End$/.test(e.key)) return;
       if (e.key === 'Escape') { closeDrawer(); setSheet(false); return; }
+      if (e.key === '?') { e.preventDefault(); openHelp(); return; }
+      const k = e.key.toLowerCase();
+      if (k === 't') return handlers.tour();
+      if (k === 'm') return handlers.sound();
+      if (k === 'f') { if (tab !== 'facts') selectTab('facts'); else showFact(factIndex + 1, true); return; }
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); handlers.next(); }
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); handlers.prev(); }
-      else if (/^[1-7]$/.test(e.key)) handlers.select(Number(e.key) - 1);
+      else if (/^[1-9]$/.test(e.key) && Number(e.key) <= wonders.length) handlers.select(Number(e.key) - 1);
     });
 
     // Horizontal swipe on the headline or the sheet handle travels (the canvas keeps drag-to-rotate).
@@ -337,11 +558,24 @@ export function createUI({ reducedMotion = false } = {}) {
   }
 
   return {
-    init, setThumbnails, setLoading, hideLoader, showNo3D,
+    init, setThumbnails, setLoading, hideLoader, showNo3D, showLoaderFact,
     leave, enter, travel, setActive, layoutInsets, closeDrawer,
+    setTour, setSound,
   };
 }
 
+/** Great-circle distance in km. */
+export function haversineKm(a, b) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+function fmtKm(km) {
+  return `${Math.round(km).toLocaleString('en-GB')} km`;
+}
+
 function escapeHTML(s) {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }

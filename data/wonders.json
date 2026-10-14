@@ -2,8 +2,9 @@
   "meta": {
     "title": "The New Seven Wonders of the World",
     "selected": "2007-07-07",
-    "note": "Announced in Lisbon on 7 July 2007 after a global public poll run by the New7Wonders Foundation. The Great Pyramid of Giza, the only surviving wonder of the ancient list, was given honorary status.",
-    "modelNote": "Set model.glb (and optionally model.glbMobile) to Draco-compressed .glb paths to replace the procedural stand-in. model.usdz enables AR Quick Look on iOS. model.points may point to a Float32 xyz .bin cloud from tools/blender_export_wonders.py. model.rotationY (degrees) turns the model to face the camera; model.frameScale < 1 frames it closer."
+    "note": "Announced in Lisbon on 7 July 2007 after a global public poll run by the New7Wonders Foundation. The Great Pyramid of Giza, the only surviving wonder of the ancient list, was given honorary status and appears here last, marked as honorary.",
+    "modelNote": "Set model.glb (and optionally model.glbMobile) to Draco-compressed .glb paths to replace the procedural stand-in. model.usdz enables AR Quick Look on iOS. model.points may point to a Float32 xyz .bin cloud from tools/blender_export_wonders.py. model.rotationY (degrees) turns the model to face the camera; model.frameScale < 1 frames it closer.",
+    "contentNote": "Visitor figures change every year; each carries the year it refers to. Contested numbers are given as ranges or with 'about'. Each wonder lists its sources."
   },
   "wonders": [
     {
@@ -18,17 +19,114 @@
       "built": "7th century BC – AD 1644",
       "builtBy": "Successive Chinese states and dynasties; most surviving masonry is Ming (1368–1644)",
       "unesco": 1987,
-      "stat": {
-        "value": "21,196 km",
-        "label": "of walls recorded in China's 2012 national survey"
-      },
+      "keyStats": [
+        {
+          "value": "21,196 km",
+          "label": "of walls recorded in China's 2012 national survey"
+        },
+        {
+          "value": "8,852 km",
+          "label": "built under the Ming alone, by the 2009 survey"
+        },
+        {
+          "value": "43,721",
+          "label": "wall sections, forts and passes catalogued"
+        },
+        {
+          "value": "15",
+          "label": "provinces and regions crossed"
+        }
+      ],
       "context": "Not one wall but a network of fortifications, built and rebuilt over two thousand years to guard northern frontiers against steppe incursions. Qin Shi Huang linked earlier walls after unifying China in 221 BC; the brick-and-stone ramparts most visitors walk today are largely Ming dynasty work.",
       "highlights": [
         "Ming builders bound bricks with a mortar of slaked lime and sticky-rice soup, whose amylopectin made it unusually strong and water-resistant.",
         "Watchtowers were spaced within signalling distance, relaying warnings by smoke by day and fire by night.",
         "The wall follows ridgelines deliberately, turning the terrain itself into part of the defence."
       ],
-      "funFact": "It is not visible to the naked eye from the Moon — the myth predates spaceflight. China's first astronaut, Yang Liwei, said in 2003 that he could not make it out from orbit.",
+      "materials": [
+        "Rammed earth",
+        "Stone",
+        "Fired brick",
+        "Sticky-rice lime mortar",
+        "Reeds and gravel (Gobi sections)"
+      ],
+      "timeline": [
+        {
+          "year": "7th c. BC",
+          "event": "The state of Chu builds some of the earliest frontier walls."
+        },
+        {
+          "year": "221 BC",
+          "event": "Qin Shi Huang unifies China and links earlier walls under general Meng Tian."
+        },
+        {
+          "year": "2nd c. BC",
+          "event": "The Han extend the wall west into the Gansu corridor, past Dunhuang to Yumen Pass."
+        },
+        {
+          "year": "1368",
+          "event": "The Ming dynasty is founded and begins rebuilding the northern defences."
+        },
+        {
+          "year": "1569",
+          "event": "Mutianyu is rebuilt in brick and stone under general Qi Jiguang."
+        },
+        {
+          "year": "1644",
+          "event": "Ming general Wu Sangui opens Shanhai Pass and the Qing armies ride through."
+        },
+        {
+          "year": "1987",
+          "event": "Inscribed on the UNESCO World Heritage List."
+        },
+        {
+          "year": "2012",
+          "event": "A national survey puts the total length of all walls at 21,196 km."
+        }
+      ],
+      "facts": [
+        {
+          "type": "myth",
+          "text": "You can see the Great Wall from the Moon.",
+          "truth": "You can't — it's long but only a few metres wide. China's first astronaut, Yang Liwei, said in 2003 that he couldn't make it out from orbit either."
+        },
+        {
+          "type": "myth",
+          "text": "Workers who died building it were buried inside the wall.",
+          "truth": "No human remains have been found in the wall's fabric. The story owes much to the folk tale of Meng Jiangnü, whose weeping brought down a stretch of wall."
+        },
+        {
+          "type": "fact",
+          "text": "The wall was a customs line as well as a defence: its passes controlled and taxed trade along the Silk Road."
+        },
+        {
+          "type": "fact",
+          "text": "In the Gobi, Han builders had no stone or clay to spare, so they layered reeds and tamarisk branches with gravel. Sections near Dunhuang still stand after 2,000 years."
+        },
+        {
+          "type": "fact",
+          "text": "Much of the wall is unrestored and eroding: a 2015 estimate suggested close to 30% of the Ming wall had already disappeared."
+        }
+      ],
+      "visit": {
+        "nearestCity": "Beijing — Mutianyu is about 70 km north-east",
+        "bestTime": "April–May and September–October",
+        "visitors": {
+          "value": "9.9 million at Badaling alone",
+          "year": 2018
+        },
+        "note": "Badaling, the busiest section, caps entry at 65,000 people a day and needs a real-name booking. Mutianyu is quieter and has a cable car."
+      },
+      "sources": [
+        {
+          "label": "UNESCO World Heritage Centre — The Great Wall",
+          "url": "https://whc.unesco.org/en/list/438/"
+        },
+        {
+          "label": "Encyclopaedia Britannica — Great Wall of China",
+          "url": "https://www.britannica.com/topic/Great-Wall-of-China"
+        }
+      ],
       "theme": {
         "skyTop": "#16222e",
         "skyBottom": "#4d5f5c",
@@ -57,17 +155,106 @@
       "built": "c. 1st century BC – 1st century AD (peak)",
       "builtBy": "Nabataean Arabs",
       "unesco": 1985,
-      "stat": {
-        "value": "1.2 km",
-        "label": "length of the Siq, the narrow gorge that leads to the Treasury"
-      },
+      "keyStats": [
+        {
+          "value": "1.2 km",
+          "label": "length of the Siq, the narrow gorge that leads to the Treasury"
+        },
+        {
+          "value": "~39 m",
+          "label": "height of the Treasury's carved façade"
+        },
+        {
+          "value": "264 km²",
+          "label": "Petra Archaeological Park"
+        },
+        {
+          "value": "~800",
+          "label": "rock-cut steps up to the Monastery, Ad Deir"
+        }
+      ],
       "context": "Capital of the Nabataean kingdom, Petra grew rich controlling caravan routes for incense, spices and textiles between Arabia, Egypt and the Mediterranean. Rome annexed it in AD 106; earthquakes and shifting trade routes later emptied it, and Swiss explorer Johann Ludwig Burckhardt described it to Europe in 1812.",
       "highlights": [
         "Façades such as Al-Khazneh were carved top-down directly out of the sandstone cliff rather than built from blocks.",
         "Dams, cisterns and rock-cut channels captured flash floods and sustained a city of thousands in the desert.",
         "The architecture fuses Nabataean tradition with Hellenistic columns, pediments and a central tholos."
       ],
-      "funFact": "The stone urn crowning Al-Khazneh is pocked with bullet marks — Bedouin once shot at it, believing it hid a pharaoh's treasure. That legend is how 'The Treasury' got its name.",
+      "materials": [
+        "Rose-red sandstone",
+        "Lime plaster and paint (now mostly lost)"
+      ],
+      "timeline": [
+        {
+          "year": "312 BC",
+          "event": "First historical record: Greek forces under Antigonus I raid the Nabataeans at Petra."
+        },
+        {
+          "year": "c. 9 BC–AD 40",
+          "event": "Reign of Aretas IV, Petra's golden age; the Treasury is probably carved now."
+        },
+        {
+          "year": "AD 106",
+          "event": "Rome annexes the Nabataean kingdom as the province of Arabia Petraea."
+        },
+        {
+          "year": "AD 363",
+          "event": "A major earthquake destroys much of the free-standing city."
+        },
+        {
+          "year": "1812",
+          "event": "Johann Ludwig Burckhardt reaches Petra in disguise and describes it to Europe."
+        },
+        {
+          "year": "1985",
+          "event": "Inscribed on the UNESCO World Heritage List."
+        },
+        {
+          "year": "1989",
+          "event": "The Treasury stars in Indiana Jones and the Last Crusade."
+        }
+      ],
+      "facts": [
+        {
+          "type": "myth",
+          "text": "The Treasury hid a pharaoh's gold — Bedouin shot at its stone urn to burst it open, and the bullet marks are still there.",
+          "truth": "It was almost certainly a royal tomb, most often attributed to King Aretas IV. The urn is solid rock."
+        },
+        {
+          "type": "fact",
+          "text": "'Petra' is Greek for 'rock'. The Nabataeans themselves called the city Raqmu."
+        },
+        {
+          "type": "fact",
+          "text": "Burckhardt got in by posing as a Muslim scholar, 'Sheikh Ibrahim', who wanted to sacrifice a goat at the nearby tomb of Aaron."
+        },
+        {
+          "type": "fact",
+          "text": "An often-quoted estimate is that only about 15% of the city has been excavated."
+        },
+        {
+          "type": "fact",
+          "text": "In 2016, archaeologists using satellite imagery found a huge buried platform, about 56 × 49 m, just south of the city centre."
+        }
+      ],
+      "visit": {
+        "nearestCity": "Wadi Musa, at the gate — about 3 hours' drive from Amman",
+        "bestTime": "March–May and September–November",
+        "visitors": {
+          "value": "1.14 million",
+          "year": 2019
+        },
+        "note": "Allow a full day; the walk from the gate to the Treasury alone is about 2 km. The Jordan Pass bundles entry with the tourist visa."
+      },
+      "sources": [
+        {
+          "label": "UNESCO World Heritage Centre — Petra",
+          "url": "https://whc.unesco.org/en/list/326/"
+        },
+        {
+          "label": "Encyclopaedia Britannica — Petra",
+          "url": "https://www.britannica.com/place/Petra-ancient-city-Jordan"
+        }
+      ],
       "theme": {
         "skyTop": "#26131d",
         "skyBottom": "#7a3a35",
@@ -96,17 +283,107 @@
       "built": "1922 – 1931",
       "builtBy": "Engineer Heitor da Silva Costa, sculptor Paul Landowski, face by Gheorghe Leonida",
       "unesco": 2012,
-      "stat": {
-        "value": "30 m",
-        "label": "statue height on an 8 m pedestal, 700 m above the city"
-      },
+      "unescoNote": "The statue has no listing of its own: it is part of “Rio de Janeiro: Carioca Landscapes between the Mountain and the Sea”, inscribed in 2012.",
+      "keyStats": [
+        {
+          "value": "30 m",
+          "label": "statue height on an 8 m pedestal, 700 m above the city"
+        },
+        {
+          "value": "28 m",
+          "label": "from fingertip to fingertip"
+        },
+        {
+          "value": "635 t",
+          "label": "of reinforced concrete and soapstone"
+        },
+        {
+          "value": "9 years",
+          "label": "from cornerstone to inauguration"
+        }
+      ],
       "context": "Conceived around Brazil's independence centenary in 1922 and funded largely by public donations, the statue was assembled on the summit of Corcovado from reinforced concrete and inaugurated on 12 October 1931. It overlooks Rio from the Tijuca forest.",
       "highlights": [
         "A reinforced-concrete core, engineered by Heitor da Silva Costa with Albert Caquot, carries arms that span 28 m.",
         "The skin is a mosaic of thousands of small triangular soapstone tiles — durable and easy to work.",
         "The head and hands were modelled in Paris by Paul Landowski, with the face by Romanian sculptor Gheorghe Leonida."
       ],
-      "funFact": "Lightning strikes the statue several times a year. The archdiocese keeps a stock of matching soapstone on hand to repair chipped fingers and the head.",
+      "materials": [
+        "Reinforced concrete",
+        "Soapstone tiles"
+      ],
+      "timeline": [
+        {
+          "year": "1859",
+          "event": "A Vincentian priest first proposes a religious monument on Corcovado."
+        },
+        {
+          "year": "1884",
+          "event": "The Corcovado rack railway opens; it will later haul the statue's materials up the mountain."
+        },
+        {
+          "year": "1922",
+          "event": "Cornerstone laid on 4 April, for the centenary of Brazilian independence."
+        },
+        {
+          "year": "1926",
+          "event": "Construction begins on the summit."
+        },
+        {
+          "year": "1931",
+          "event": "Inaugurated on 12 October."
+        },
+        {
+          "year": "2006",
+          "event": "A chapel in the pedestal is consecrated for the statue's 75th anniversary."
+        },
+        {
+          "year": "2012",
+          "event": "Inscribed by UNESCO as part of Rio's Carioca Landscapes."
+        }
+      ],
+      "facts": [
+        {
+          "type": "myth",
+          "text": "Like the Statue of Liberty, it was a gift from France.",
+          "truth": "It was paid for largely by donations from Brazilian Catholics. The French connection is Paul Landowski, who sculpted the head and hands in Paris."
+        },
+        {
+          "type": "fact",
+          "text": "Lightning strikes the statue several times a year. In 2014 a strike chipped the right thumb, and the archdiocese keeps matching soapstone for repairs."
+        },
+        {
+          "type": "fact",
+          "text": "Corcovado means 'hunchback' in Portuguese, after the shape of the granite peak."
+        },
+        {
+          "type": "fact",
+          "text": "The plan for the 1931 inauguration was for Guglielmo Marconi to switch on the floodlights by radio from Rome. Bad weather got in the way and the lights were switched on locally."
+        },
+        {
+          "type": "fact",
+          "text": "Since 2003, escalators and panoramic lifts have spared visitors the last 220 steps to the summit."
+        }
+      ],
+      "visit": {
+        "nearestCity": "Rio de Janeiro",
+        "bestTime": "May–October, the drier months; go early before cloud settles on the summit",
+        "visitors": {
+          "value": "about 2 million a year",
+          "year": 2019
+        },
+        "note": "Reach the top by the rack railway through the Tijuca forest, by official vans, or on foot via the Parque Lage trail."
+      },
+      "sources": [
+        {
+          "label": "UNESCO World Heritage Centre — Rio de Janeiro: Carioca Landscapes",
+          "url": "https://whc.unesco.org/en/list/1100/"
+        },
+        {
+          "label": "Encyclopaedia Britannica — Christ the Redeemer",
+          "url": "https://www.britannica.com/topic/Christ-the-Redeemer"
+        }
+      ],
       "theme": {
         "skyTop": "#0d1f38",
         "skyBottom": "#386784",
@@ -135,17 +412,110 @@
       "built": "c. 1450",
       "builtBy": "The Inca, as a royal estate for the emperor Pachacuti",
       "unesco": 1983,
-      "stat": {
-        "value": "2,430 m",
-        "label": "above sea level, on a saddle between two peaks"
-      },
+      "keyStats": [
+        {
+          "value": "2,430 m",
+          "label": "above sea level, on a saddle between two peaks"
+        },
+        {
+          "value": "~60%",
+          "label": "of the construction lies underground"
+        },
+        {
+          "value": "32,592 ha",
+          "label": "protected as the Historic Sanctuary"
+        },
+        {
+          "value": "~42 km",
+          "label": "the classic Inca Trail from the Sacred Valley"
+        }
+      ],
       "context": "Built as a royal estate for the Inca emperor Pachacuti in the mid-15th century, the citadel sits above the Urubamba River and was abandoned around the time of the Spanish conquest. The conquistadors never found it; it came to international attention in 1911 through Hiram Bingham, guided by local farmers who knew it well.",
       "highlights": [
         "Granite ashlar walls are cut so precisely that the blocks fit together without mortar.",
         "Agricultural terraces double as retaining walls and drainage against heavy Andean rainfall.",
         "A window of the Temple of the Sun frames the sunrise on the June solstice."
       ],
-      "funFact": "Most of the engineering is out of sight: studies estimate around 60% of the construction lies underground, in foundations and crushed-rock drainage.",
+      "materials": [
+        "Granite (quarried on site)",
+        "Crushed-rock drainage fill"
+      ],
+      "timeline": [
+        {
+          "year": "c. 1420",
+          "event": "Radiocarbon dates published in 2021 show people living here decades earlier than once thought."
+        },
+        {
+          "year": "c. 1450",
+          "event": "Built up as a royal estate for the emperor Pachacuti."
+        },
+        {
+          "year": "c. 1570s",
+          "event": "Abandoned around the time of the Spanish conquest; the Spanish never find it."
+        },
+        {
+          "year": "1902",
+          "event": "Local farmer Agustín Lizárraga writes his name in charcoal on a wall of the Temple of the Three Windows."
+        },
+        {
+          "year": "1911",
+          "event": "Hiram Bingham, guided by local farmers, brings it to international attention."
+        },
+        {
+          "year": "1913",
+          "event": "An entire issue of National Geographic is devoted to the site."
+        },
+        {
+          "year": "1983",
+          "event": "Inscribed on the UNESCO World Heritage List."
+        },
+        {
+          "year": "2011–12",
+          "event": "Yale University returns thousands of artefacts Bingham took to the US."
+        }
+      ],
+      "facts": [
+        {
+          "type": "myth",
+          "text": "Hiram Bingham discovered a 'lost city' in 1911.",
+          "truth": "It was never lost to the people who lived nearby. Families were farming its terraces when Bingham arrived, and a local farmer had signed a wall nine years earlier."
+        },
+        {
+          "type": "fact",
+          "text": "Its Inca name may not have been Machu Picchu: a 2021 study of colonial documents suggests it was called Huayna Picchu, or simply Picchu."
+        },
+        {
+          "type": "fact",
+          "text": "The citadel sits on top of geological fault lines, which supplied the fractured granite its builders cut into blocks."
+        },
+        {
+          "type": "fact",
+          "text": "Most of the engineering is out of sight: studies estimate around 60% of the construction lies underground, in foundations and crushed-rock drainage."
+        },
+        {
+          "type": "fact",
+          "text": "The Intihuatana, a carved granite pillar, is thought to have served as an astronomical marker for the solstices."
+        }
+      ],
+      "visit": {
+        "nearestCity": "Aguas Calientes, in the valley below — Cusco is about 75 km away",
+        "bestTime": "April–October, the dry season",
+        "visitors": {
+          "value": "1.59 million",
+          "year": 2019
+        },
+        "note": "Entry is by timed ticket on fixed one-way circuits; book well ahead in the dry season. The classic Inca Trail closes every February for maintenance."
+      },
+      "sources": [
+        {
+          "label": "UNESCO World Heritage Centre — Historic Sanctuary of Machu Picchu",
+          "url": "https://whc.unesco.org/en/list/274/"
+        },
+        {
+          "label": "Encyclopaedia Britannica — Machu Picchu",
+          "url": "https://www.britannica.com/place/Machu-Picchu"
+        }
+      ],
       "theme": {
         "skyTop": "#11221c",
         "skyBottom": "#486a55",
@@ -174,17 +544,106 @@
       "built": "c. AD 600 – 1200 (city's height)",
       "builtBy": "The Maya (Itza)",
       "unesco": 1988,
-      "stat": {
-        "value": "365",
-        "label": "steps across El Castillo's four stairways and top platform"
-      },
+      "keyStats": [
+        {
+          "value": "365",
+          "label": "steps across El Castillo's four stairways and top platform"
+        },
+        {
+          "value": "~30 m",
+          "label": "height of El Castillo, temple included"
+        },
+        {
+          "value": "168 × 70 m",
+          "label": "the Great Ball Court, largest in Mesoamerica"
+        },
+        {
+          "value": "~60 m",
+          "label": "across the Sacred Cenote"
+        }
+      ],
       "context": "One of the largest Maya cities, Chichén Itzá was a political and economic centre of the northern Yucatán for some six centuries. Its architecture blends Maya and central Mexican styles around El Castillo, the pyramid-temple of the feathered serpent Kukulcán.",
       "highlights": [
         "Each of El Castillo's four stairways has 91 steps; with the top platform they total 365, one for each day of the solar year.",
         "At the spring and autumn equinoxes, late-afternoon shadows form a serpent of light descending the north stairway.",
         "An earlier, smaller pyramid is encased inside the one you see."
       ],
-      "funFact": "Clap at the foot of El Castillo's stairway and the echo comes back as a chirp that many compare to the call of the sacred quetzal bird.",
+      "materials": [
+        "Limestone",
+        "Lime stucco, originally painted"
+      ],
+      "timeline": [
+        {
+          "year": "c. AD 600",
+          "event": "Chichén Itzá begins to rise as a regional power in the northern Yucatán."
+        },
+        {
+          "year": "9th–12th c.",
+          "event": "Its height: El Castillo is built over an earlier pyramid."
+        },
+        {
+          "year": "c. 1200",
+          "event": "Decline; Mayapán becomes the dominant city of the region."
+        },
+        {
+          "year": "1843",
+          "event": "John Lloyd Stephens and Frederick Catherwood publish their drawings of the ruins."
+        },
+        {
+          "year": "1904–10",
+          "event": "Edward Thompson dredges the Sacred Cenote, recovering gold, jade and human remains."
+        },
+        {
+          "year": "1988",
+          "event": "Inscribed on the UNESCO World Heritage List."
+        },
+        {
+          "year": "2006",
+          "event": "Climbing El Castillo is banned after a fatal fall."
+        }
+      ],
+      "facts": [
+        {
+          "type": "myth",
+          "text": "The losing — or the winning — ball-game team was sacrificed.",
+          "truth": "Nobody knows. The Great Ball Court's reliefs show a decapitation, but they are ritual imagery, not a record of what happened after a match."
+        },
+        {
+          "type": "fact",
+          "text": "Clap at the foot of El Castillo's stairway and the echo comes back as a chirp that many compare to the call of the sacred quetzal bird."
+        },
+        {
+          "type": "fact",
+          "text": "El Castillo is a nesting doll: an inner pyramid was excavated in the 1930s, and in 2016 scans found a third, smaller structure inside that."
+        },
+        {
+          "type": "fact",
+          "text": "The name means 'at the mouth of the well of the Itza' — the city grew up around its cenotes, natural sinkholes into the water table."
+        },
+        {
+          "type": "fact",
+          "text": "The Sacred Cenote was a place of offering: divers and dredges have recovered jade, gold, incense and the bones of people thrown in."
+        }
+      ],
+      "visit": {
+        "nearestCity": "Valladolid, about 40 km — Mérida is about 120 km",
+        "bestTime": "November–March, cooler and drier; arrive at opening",
+        "visitors": {
+          "value": "2.33 million",
+          "year": 2023
+        },
+        "note": "The equinoxes (around 20 March and 22 September) draw huge crowds for the serpent of light. The pyramid can no longer be climbed."
+      },
+      "sources": [
+        {
+          "label": "UNESCO World Heritage Centre — Pre-Hispanic City of Chichen-Itza",
+          "url": "https://whc.unesco.org/en/list/483/"
+        },
+        {
+          "label": "Encyclopaedia Britannica — Chichén Itzá",
+          "url": "https://www.britannica.com/place/Chichen-Itza"
+        }
+      ],
       "theme": {
         "skyTop": "#20170e",
         "skyBottom": "#76562c",
@@ -213,17 +672,118 @@
       "built": "AD 70 – 80",
       "builtBy": "Flavian emperors Vespasian and Titus",
       "unesco": 1980,
-      "stat": {
-        "value": "50,000+",
-        "label": "spectators, by most estimates, at its height"
-      },
+      "keyStats": [
+        {
+          "value": "50,000+",
+          "label": "spectators, by most estimates, at its height"
+        },
+        {
+          "value": "189 × 156 m",
+          "label": "the largest amphitheatre of the Roman world"
+        },
+        {
+          "value": "48 m",
+          "label": "height of the outer wall"
+        },
+        {
+          "value": "80",
+          "label": "arched entrances at ground level"
+        }
+      ],
       "context": "Commissioned by Vespasian on the site of Nero's palace lake and inaugurated by his son Titus in AD 80 with 100 days of games, the Flavian Amphitheatre staged gladiatorial combat, animal hunts and public spectacles for nearly four centuries.",
       "highlights": [
         "Eighty arched entrances, most of them numbered, moved huge crowds in and out quickly.",
         "The hypogeum — a two-level warren of tunnels and lifts beneath the arena — raised animals and scenery through trapdoors.",
         "A retractable awning, the velarium, shaded the seating and was rigged by sailors from the imperial fleet."
       ],
-      "funFact": "The missing southern outer wall wasn't lost to war. Earthquakes, notably in 1349, brought it down, and the fallen travertine was quarried for buildings across Rome.",
+      "materials": [
+        "Travertine",
+        "Tuff",
+        "Brick-faced concrete",
+        "Marble (seating)",
+        "Iron clamps"
+      ],
+      "timeline": [
+        {
+          "year": "c. AD 72",
+          "event": "Vespasian begins construction on the drained lake of Nero's palace."
+        },
+        {
+          "year": "AD 80",
+          "event": "Titus inaugurates the amphitheatre with 100 days of games."
+        },
+        {
+          "year": "AD 81–96",
+          "event": "Domitian adds the hypogeum beneath the arena floor."
+        },
+        {
+          "year": "AD 217",
+          "event": "Lightning sets the upper levels on fire; repairs take decades."
+        },
+        {
+          "year": "523",
+          "event": "The last recorded animal hunts are staged."
+        },
+        {
+          "year": "1349",
+          "event": "An earthquake brings down the southern outer wall."
+        },
+        {
+          "year": "1749",
+          "event": "Pope Benedict XIV consecrates the Colosseum to the memory of Christian martyrs."
+        },
+        {
+          "year": "1980",
+          "event": "Inscribed by UNESCO with the Historic Centre of Rome."
+        }
+      ],
+      "facts": [
+        {
+          "type": "myth",
+          "text": "Christians were routinely thrown to the lions here.",
+          "truth": "There's no firm evidence that Christians were executed in the Colosseum itself. The tradition took hold centuries later and was sealed by the 1749 consecration."
+        },
+        {
+          "type": "myth",
+          "text": "Thumbs down meant death for a defeated gladiator.",
+          "truth": "Roman sources only say 'pollice verso' — a turned thumb — and its direction is unknown. The thumbs-down image comes from Gérôme's 1872 painting."
+        },
+        {
+          "type": "fact",
+          "text": "The name probably comes from the Colossus of Nero, a giant bronze statue that stood next to it. The Romans called it the Flavian Amphitheatre."
+        },
+        {
+          "type": "fact",
+          "text": "The holes pocking the façade are where medieval Romans dug out the iron clamps that held the stone blocks together."
+        },
+        {
+          "type": "fact",
+          "text": "The missing southern outer wall wasn't lost to war. Earthquakes, notably in 1349, brought it down, and the fallen travertine was quarried for buildings across Rome."
+        }
+      ],
+      "visit": {
+        "nearestCity": "Central Rome — Colosseo metro station is across the road",
+        "bestTime": "November–March, or first entry of the day in summer",
+        "visitors": {
+          "value": "7.6 million",
+          "year": 2019
+        },
+        "note": "Tickets are timed and name-specific. The standard ticket also covers the Roman Forum and Palatine Hill; the arena floor and hypogeum need a separate option."
+      },
+      "sources": [
+        {
+          "label": "UNESCO World Heritage Centre — Historic Centre of Rome",
+          "url": "https://whc.unesco.org/en/list/91/"
+        },
+        {
+          "label": "Parco archeologico del Colosseo",
+          "url": "https://colosseo.it/en/"
+        },
+        {
+          "label": "Encyclopaedia Britannica — Colosseum",
+          "url": "https://www.britannica.com/topic/Colosseum"
+        }
+      ],
       "theme": {
         "skyTop": "#1c1828",
         "skyBottom": "#674b47",
@@ -252,23 +812,253 @@
       "built": "1632 – 1653",
       "builtBy": "Mughal emperor Shah Jahan; architect attributed to Ustad Ahmad Lahauri",
       "unesco": 1983,
-      "stat": {
-        "value": "20,000",
-        "label": "artisans, by contemporary accounts, worked on the complex"
-      },
+      "keyStats": [
+        {
+          "value": "20,000",
+          "label": "artisans, by contemporary accounts, worked on the complex"
+        },
+        {
+          "value": "73 m",
+          "label": "from the plinth to the tip of the finial"
+        },
+        {
+          "value": "~17 ha",
+          "label": "complex of gardens, gateway, mosque and guest house"
+        },
+        {
+          "value": "21 years",
+          "label": "from the first work in 1632 to the finished complex in 1653"
+        }
+      ],
       "context": "Shah Jahan commissioned the Taj Mahal in 1632 as a tomb for his wife Mumtaz Mahal, who died in 1631. Set on the bank of the Yamuna, the complex balances Persian, Islamic and Indian traditions; the mausoleum was finished around 1643 and the wider complex about a decade later.",
       "highlights": [
         "White Makrana marble is inlaid with semi-precious stones in pietra dura, known locally as parchin kari.",
         "The four minarets lean very slightly outward, so that in an earthquake they would fall away from the tomb.",
         "The garden is a charbagh — four quarters divided by water channels — with the tomb at the far end rather than the centre."
       ],
-      "funFact": "The complex is almost perfectly symmetrical. The one exception is Shah Jahan's own cenotaph, placed beside Mumtaz Mahal's after his death in 1666.",
+      "materials": [
+        "White Makrana marble",
+        "Red sandstone",
+        "Pietra dura inlay: jade, lapis lazuli, carnelian and more"
+      ],
+      "timeline": [
+        {
+          "year": "1631",
+          "event": "Mumtaz Mahal dies in childbirth at Burhanpur."
+        },
+        {
+          "year": "1632",
+          "event": "Shah Jahan begins the tomb on the bank of the Yamuna."
+        },
+        {
+          "year": "c. 1643",
+          "event": "The mausoleum itself is completed."
+        },
+        {
+          "year": "1653",
+          "event": "The wider complex is finished."
+        },
+        {
+          "year": "1658",
+          "event": "Shah Jahan is deposed by his son Aurangzeb and confined in Agra Fort, in sight of the tomb."
+        },
+        {
+          "year": "1666",
+          "event": "Shah Jahan dies and is buried beside Mumtaz Mahal."
+        },
+        {
+          "year": "1983",
+          "event": "Inscribed on the UNESCO World Heritage List."
+        },
+        {
+          "year": "1996",
+          "event": "India's Supreme Court restricts polluting industry around Agra to protect the marble."
+        }
+      ],
+      "facts": [
+        {
+          "type": "myth",
+          "text": "Shah Jahan had the craftsmen's hands cut off so they could never build anything as beautiful.",
+          "truth": "There's no historical evidence for it. The same legend is told about buildings all over the world."
+        },
+        {
+          "type": "myth",
+          "text": "Shah Jahan planned a matching Black Taj for himself across the river.",
+          "truth": "The idea traces to the travel writer Tavernier. Excavations at Mehtab Bagh, opposite, found a moonlight garden for viewing the Taj — no black tomb."
+        },
+        {
+          "type": "fact",
+          "text": "The calligraphy around the main arch gets larger towards the top, so from the ground it reads as one even size."
+        },
+        {
+          "type": "fact",
+          "text": "The cenotaphs visitors see are empty. The actual graves lie in a plainer crypt below."
+        },
+        {
+          "type": "fact",
+          "text": "During the Second World War and the wars with Pakistan in 1965 and 1971, the dome was hidden under scaffolding to confuse bomber pilots."
+        },
+        {
+          "type": "fact",
+          "text": "To undo yellowing from air pollution, conservators coat the marble in a clay mudpack, multani mitti, and wash it off."
+        }
+      ],
+      "visit": {
+        "nearestCity": "Agra — about 3 hours from Delhi by expressway or train",
+        "bestTime": "October–March; sunrise for the light and the thinnest crowds",
+        "visitors": {
+          "value": "about 5 million",
+          "year": 2019
+        },
+        "note": "Closed on Fridays. Night viewing is offered on full-moon nights and the two nights either side."
+      },
+      "sources": [
+        {
+          "label": "UNESCO World Heritage Centre — Taj Mahal",
+          "url": "https://whc.unesco.org/en/list/252/"
+        },
+        {
+          "label": "Encyclopaedia Britannica — Taj Mahal",
+          "url": "https://www.britannica.com/topic/Taj-Mahal"
+        }
+      ],
       "theme": {
         "skyTop": "#1a162c",
         "skyBottom": "#80667c",
         "accent": "#f3e4d2",
         "particle": "#fbefe2",
         "key": "#ffe6d0"
+      },
+      "model": {
+        "glb": null,
+        "glbMobile": null,
+        "usdz": null,
+        "points": null,
+        "rotationY": 0,
+        "frameScale": 1
+      }
+    },
+    {
+      "id": "great-pyramid",
+      "name": "Great Pyramid of Giza",
+      "honorary": true,
+      "country": "Egypt",
+      "region": "Giza Plateau, Greater Cairo",
+      "coordinates": {
+        "lat": 29.9792,
+        "lng": 31.1342
+      },
+      "built": "c. 2580 – 2560 BC",
+      "builtBy": "Pharaoh Khufu, Fourth Dynasty; design attributed to his vizier Hemiunu",
+      "unesco": 1979,
+      "keyStats": [
+        {
+          "value": "146.6 m",
+          "label": "original height; about 138.5 m today"
+        },
+        {
+          "value": "230.3 m",
+          "label": "length of each side at the base"
+        },
+        {
+          "value": "~2.3 million",
+          "label": "stone blocks, by the usual estimate"
+        },
+        {
+          "value": "3,800 years",
+          "label": "as the tallest structure built by humans"
+        }
+      ],
+      "context": "The tomb of the pharaoh Khufu is the oldest of the Seven Wonders of the Ancient World and the only one still largely standing. When Egyptian authorities objected to it competing in the 2007 public vote, the New7Wonders Foundation gave it honorary status instead.",
+      "highlights": [
+        "Its sides are aligned to the cardinal points to within a few arcminutes — a fraction of a degree.",
+        "The Grand Gallery is a corbelled passage 8.6 m tall, leading up to the granite-lined King's Chamber.",
+        "It was once cased in polished white Tura limestone; most of the casing was stripped after a 1303 earthquake to build medieval Cairo."
+      ],
+      "materials": [
+        "Local limestone (core)",
+        "Tura limestone (casing)",
+        "Aswan granite (King's Chamber)",
+        "Gypsum mortar"
+      ],
+      "timeline": [
+        {
+          "year": "c. 2580 BC",
+          "event": "Work begins for Khufu, second king of the Fourth Dynasty."
+        },
+        {
+          "year": "c. 2560 BC",
+          "event": "The pyramid is completed, after about 20 years."
+        },
+        {
+          "year": "c. 440 BC",
+          "event": "Herodotus visits and writes that 100,000 men worked on it in shifts."
+        },
+        {
+          "year": "c. AD 820",
+          "event": "Caliph al-Ma'mun's workers tunnel in, creating the entrance most visitors use today."
+        },
+        {
+          "year": "1303",
+          "event": "An earthquake loosens the casing stones, which are carted off for Cairo's buildings."
+        },
+        {
+          "year": "c. 1311",
+          "event": "The spire of Lincoln Cathedral finally overtakes its height."
+        },
+        {
+          "year": "1979",
+          "event": "Inscribed by UNESCO with the pyramid fields from Giza to Dahshur."
+        },
+        {
+          "year": "2017",
+          "event": "Muon scans by the ScanPyramids project reveal a large hidden void above the Grand Gallery."
+        }
+      ],
+      "facts": [
+        {
+          "type": "myth",
+          "text": "It was built by slaves.",
+          "truth": "Excavations of the workers' town and cemeteries at Giza point to organised, fed and housed crews, many of them seasonal labourers — and some were buried in tombs of their own in the shadow of the pyramids."
+        },
+        {
+          "type": "fact",
+          "text": "Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid."
+        },
+        {
+          "type": "fact",
+          "text": "The oldest inscribed papyri ever found, discovered at Wadi al-Jarf in 2013, include the logbook of an official named Merer, who shipped limestone to Giza for the pyramid."
+        },
+        {
+          "type": "fact",
+          "text": "In 2023 an endoscope camera confirmed a sealed, 9-metre corridor hidden behind the chevron stones above the original entrance."
+        },
+        {
+          "type": "fact",
+          "text": "It's the only one of the seven ancient wonders still standing."
+        }
+      ],
+      "visit": {
+        "nearestCity": "Giza, on the western edge of Cairo",
+        "bestTime": "October–April; arrive at opening, before the heat and the tour coaches",
+        "note": "Entering the pyramid needs a separate ticket. The Grand Egyptian Museum, home to Khufu's solar boat, is about 2 km away."
+      },
+      "sources": [
+        {
+          "label": "UNESCO World Heritage Centre — Memphis and its Necropolis",
+          "url": "https://whc.unesco.org/en/list/86/"
+        },
+        {
+          "label": "Encyclopaedia Britannica — Pyramids of Giza",
+          "url": "https://www.britannica.com/topic/Pyramids-of-Giza"
+        }
+      ],
+      "theme": {
+        "skyTop": "#1b1726",
+        "skyBottom": "#86643c",
+        "accent": "#efc98a",
+        "particle": "#f6dcaa",
+        "key": "#ffd8a3"
       },
       "model": {
         "glb": null,

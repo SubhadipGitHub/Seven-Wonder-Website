@@ -4,8 +4,19 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>New Seven Wonders</title>
-  <meta name="description" content="Travel between the New Seven Wonders of the World in an interactive 3D atlas: Great Wall of China, Petra, Christ the Redeemer, Machu Picchu, Chichén Itzá, the Colosseum and the Taj Mahal." />
+  <meta name="description" content="Travel between the New Seven Wonders of the World in an interactive 3D atlas: Great Wall of China, Petra, Christ the Redeemer, Machu Picchu, Chichén Itzá, the Colosseum and the Taj Mahal — plus the honorary Great Pyramid of Giza." />
   <meta name="theme-color" content="#101a33" />
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+
+  <!-- Social cards. og:url / og:image assume GitHub Pages; change them if the site is hosted elsewhere. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="The New Seven Wonders — an atlas you can turn in your hands" />
+  <meta property="og:description" content="Watch each wonder burn into particles and re-form as the next one, with timelines, myths, facts and travel notes for all seven." />
+  <meta property="og:url" content="https://subhadipgithub.github.io/Seven-Wonder-Website/" />
+  <meta property="og:image" content="https://subhadipgithub.github.io/Seven-Wonder-Website/assets/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
 
   <!-- Fonts: Bodoni Moda (display, atlas-plate didone) + Hanken Grotesk (text). Falls back to system serif/sans offline. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -47,10 +58,11 @@
 
   <!-- Loader: fades out as the first wonder condenses out of the dust -->
   <div id="loader" class="loader fixed inset-0 z-50 grid place-items-center" aria-live="polite">
-    <div class="text-center">
+    <div class="loader-body text-center">
       <p class="loader-title">Gathering the wonders</p>
       <div class="loader-bar mx-auto mt-5" aria-hidden="true"><span id="loader-fill"></span></div>
       <p id="loader-status" class="loader-status mt-3">Preparing the stage</p>
+      <p id="loader-fact" class="loader-fact" aria-hidden="true"></p>
     </div>
   </div>
 
@@ -60,8 +72,18 @@
       <span class="brand-name">The New Seven Wonders</span>
       <span class="brand-sub hidden sm:block">An atlas you can turn in your hands</span>
     </p>
-    <div class="flex items-center gap-4">
-      <p class="counter" aria-hidden="true"><span id="counter-now">1</span><span class="counter-of"> of 7</span></p>
+    <div class="topbar-tools">
+      <p id="counter" class="counter" aria-hidden="true"><span id="counter-now">1</span><span id="counter-of" class="counter-of"> of 7</span></p>
+      <button id="btn-tour" class="icon-btn" aria-pressed="false" aria-label="Start the guided tour">
+        <svg class="i-play" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5.5v13l10-6.5-10-6.5z" fill="currentColor"/></svg>
+        <svg class="i-pause" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" fill="currentColor"/></svg>
+      </button>
+      <button id="btn-sound" class="icon-btn" aria-pressed="false" aria-label="Turn ambient sound on">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" fill="currentColor"/><path class="i-waves" d="M15 9.2c1.2 1.6 1.2 4 0 5.6M17.6 7c2.4 2.9 2.4 7.1 0 10" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><path class="i-mute" d="M15.5 9.5l5 5m0-5l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <button id="btn-help" class="icon-btn desktop-only" aria-label="Keyboard shortcuts" aria-haspopup="dialog" aria-controls="help">
+        <span aria-hidden="true" class="icon-glyph">?</span>
+      </button>
       <button id="menu-btn" class="icon-btn lg:hidden" aria-label="Open the list of wonders" aria-controls="drawer" aria-expanded="false">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
       </button>
@@ -71,12 +93,15 @@
   <main id="hud" class="pointer-events-none fixed inset-0 z-20">
     <!-- Headline: the wonder's name and where on Earth it is -->
     <section id="headline" class="headline pointer-events-auto" aria-labelledby="wonder-name">
+      <canvas id="globe" class="globe" aria-hidden="true"></canvas>
+      <p id="wonder-badge" class="badge" hidden>Honorary wonder</p>
       <h1 id="wonder-name" class="wonder-name">Great Wall of China</h1>
       <p class="coords" aria-label="Coordinates">
         <span id="coord-lat" class="coord">40.4319° N</span>
         <span id="coord-lng" class="coord">116.5704° E</span>
       </p>
       <p id="wonder-place" class="place">Northern China, China</p>
+      <p id="wonder-distance" class="distance" hidden></p>
       <div class="mobile-steps lg:hidden">
         <button class="icon-btn" data-prev aria-label="Previous wonder">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -93,28 +118,65 @@
         <span class="sheet-handle" aria-hidden="true"></span>
         <span id="sheet-label">Show details</span>
       </button>
+      <div class="tabs" role="tablist" aria-label="About this wonder">
+        <button role="tab" id="tab-overview" class="tab" aria-selected="true" aria-controls="panel-overview" data-tab="overview">Overview</button>
+        <button role="tab" id="tab-timeline" class="tab" aria-selected="false" aria-controls="panel-timeline" data-tab="timeline" tabindex="-1">Timeline</button>
+        <button role="tab" id="tab-facts" class="tab" aria-selected="false" aria-controls="panel-facts" data-tab="facts" tabindex="-1">Facts</button>
+        <button role="tab" id="tab-visit" class="tab" aria-selected="false" aria-controls="panel-visit" data-tab="visit" tabindex="-1">Visit</button>
+      </div>
       <div id="card-scroll" class="card-scroll" data-scrollable>
         <div id="card-inner" class="card-inner">
-          <dl class="facts">
-            <div><dt>Built</dt><dd id="f-built"></dd></div>
-            <div><dt>Built by</dt><dd id="f-by"></dd></div>
-            <div><dt>World Heritage since</dt><dd id="f-unesco"></dd></div>
-          </dl>
-          <p class="stat"><span id="stat-value" class="stat-value"></span> <span id="stat-label"></span></p>
-          <p id="f-context" class="context"></p>
-          <h2 class="card-h">What to look for</h2>
-          <ul id="f-highlights" class="highlights"></ul>
+          <section id="panel-overview" class="panel" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
+            <dl class="facts">
+              <div><dt>Built</dt><dd id="f-built"></dd></div>
+              <div><dt>Built by</dt><dd id="f-by"></dd></div>
+              <div><dt>World Heritage since</dt><dd><span id="f-unesco"></span><span id="f-unesco-note" class="dd-note" hidden></span></dd></div>
+            </dl>
+            <ul id="f-stats" class="stats"></ul>
+            <p id="f-context" class="context"></p>
+            <h2 class="card-h">What to look for</h2>
+            <ul id="f-highlights" class="highlights"></ul>
+            <div id="f-materials-wrap">
+              <h2 class="card-h">Built from</h2>
+              <ul id="f-materials" class="tags"></ul>
+            </div>
+          </section>
+
+          <section id="panel-timeline" class="panel" role="tabpanel" aria-labelledby="tab-timeline" tabindex="0" hidden>
+            <ol id="f-timeline" class="timeline"></ol>
+          </section>
+
+          <section id="panel-facts" class="panel" role="tabpanel" aria-labelledby="tab-facts" tabindex="0" hidden>
+            <figure id="fact" class="fact-card" aria-live="polite">
+              <p id="fact-kind" class="fact-kind"></p>
+              <p id="f-fact" class="fact-text"></p>
+              <p id="fact-truth" class="fact-truth" hidden></p>
+            </figure>
+            <div class="fact-nav">
+              <span id="fact-count" class="fact-count"></span>
+              <button id="btn-fact" class="btn btn-primary">Another fact</button>
+            </div>
+          </section>
+
+          <section id="panel-visit" class="panel" role="tabpanel" aria-labelledby="tab-visit" tabindex="0" hidden>
+            <dl id="f-visit" class="facts"></dl>
+            <p id="f-visit-note" class="context"></p>
+            <h2 class="card-h">Sources</h2>
+            <ul id="f-sources" class="sources"></ul>
+          </section>
+
           <div class="actions">
-            <button id="btn-fact" class="btn btn-primary" aria-expanded="false" aria-controls="fact">Show a fun fact</button>
-            <button id="btn-ar" class="btn btn-ghost">
+            <button id="btn-share" class="btn btn-ghost">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 15V4m0 0L8 8m4-4l4 4M6 12v6.5A1.5 1.5 0 007.5 20h9a1.5 1.5 0 001.5-1.5V12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Share
+            </button>
+            <button id="btn-ar" class="btn btn-ghost" hidden>
               <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zm0 0v9m0 0l8-4.5M12 12l-8-4.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg>
               View in AR
             </button>
           </div>
           <p id="ar-note" class="note" role="status" hidden></p>
-          <div id="fact" class="fact" hidden>
-            <p id="f-fact"></p>
-          </div>
+          <p id="share-note" class="note" role="status" hidden></p>
         </div>
       </div>
     </aside>
@@ -145,11 +207,44 @@
     </nav>
   </div>
 
-  <p id="hint" class="hint fixed z-20 hidden lg:block">Scroll or use the arrow keys to travel. Drag to turn the model, Ctrl + scroll to zoom.</p>
+  <!-- Keyboard shortcuts -->
+  <dialog id="help" class="help glass" aria-labelledby="help-title">
+    <div class="flex items-center justify-between">
+      <h2 id="help-title" class="help-title">Getting around</h2>
+      <button class="icon-btn" data-help-close aria-label="Close">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <dl class="keys">
+      <div><dt><kbd>←</kbd> <kbd>→</kbd> or scroll</dt><dd>Previous / next wonder</dd></div>
+      <div><dt><kbd>1</kbd> – <kbd id="help-max">8</kbd></dt><dd>Jump to a wonder</dd></div>
+      <div><dt>Drag</dt><dd>Turn the model</dd></div>
+      <div><dt><kbd>Ctrl</kbd> + scroll</dt><dd>Zoom</dd></div>
+      <div><dt><kbd>T</kbd></dt><dd>Start or stop the guided tour</dd></div>
+      <div><dt><kbd>M</kbd></dt><dd>Sound on / off</dd></div>
+      <div><dt><kbd>F</kbd></dt><dd>Another fact</dd></div>
+      <div><dt><kbd>?</kbd></dt><dd>This panel</dd></div>
+      <div><dt><kbd>Esc</kbd></dt><dd>Close panels</dd></div>
+    </dl>
+  </dialog>
+
+  <p id="hint" class="hint fixed z-20 hidden lg:block">Scroll or use the arrow keys to travel. Drag to turn the model, Ctrl + scroll to zoom. Press ? for all shortcuts.</p>
   <p id="sr-status" class="sr-only" aria-live="polite"></p>
 
   <noscript>
-    <p class="noscript">This atlas needs JavaScript to show the 3D models.</p>
+    <div class="noscript">
+      <p>This atlas needs JavaScript to show the 3D models. The wonders it covers:</p>
+      <ul>
+        <li><strong>Great Wall of China</strong> — 21,196 km of fortifications built over two thousand years.</li>
+        <li><strong>Petra</strong>, Jordan — the Nabataean city carved into rose-red sandstone.</li>
+        <li><strong>Christ the Redeemer</strong>, Brazil — 30 m of concrete and soapstone above Rio, 1931.</li>
+        <li><strong>Machu Picchu</strong>, Peru — the Inca royal estate at 2,430 m.</li>
+        <li><strong>Chichén Itzá</strong>, Mexico — the Maya city of El Castillo and its 365 steps.</li>
+        <li><strong>Colosseum</strong>, Italy — Rome's 50,000-seat Flavian Amphitheatre, AD 80.</li>
+        <li><strong>Taj Mahal</strong>, India — Shah Jahan's marble tomb for Mumtaz Mahal.</li>
+        <li><strong>Great Pyramid of Giza</strong>, Egypt (honorary) — the last ancient wonder still standing.</li>
+      </ul>
+    </div>
   </noscript>
 </body>
 </html>
