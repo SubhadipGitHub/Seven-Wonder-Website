@@ -12,6 +12,7 @@
  */
 import gsap from 'gsap';
 import { createGlobe } from './globe.js';
+import { createQuiz } from './quiz.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -30,6 +31,8 @@ export function createUI({ reducedMotion = false } = {}) {
     lng: $('#coord-lng'),
     place: $('#wonder-place'),
     distance: $('#wonder-distance'),
+    timeChip: $('#wonder-time'),
+    timeText: $('#wonder-time-text'),
     counterNow: $('#counter-now'),
     counterOf: $('#counter-of'),
     card: $('#card'),
@@ -68,6 +71,8 @@ export function createUI({ reducedMotion = false } = {}) {
     helpBtn: $('#btn-help'),
     help: $('#help'),
     helpMax: $('#help-max'),
+    quiz: $('#quiz'),
+    quizBtn: $('#btn-quiz'),
     sheetToggle: $('#sheet-toggle'),
     sheetLabel: $('#sheet-label'),
     status: $('#sr-status'),
@@ -77,13 +82,15 @@ export function createUI({ reducedMotion = false } = {}) {
   };
 
   let wonders = [];
-  let handlers = { select() {}, next() {}, prev() {}, tour() {}, sound() {} };
+  let handlers = { select() {}, next() {}, prev() {}, tour() {}, sound() {}, time() {} };
   let currentData = null;
   let previousData = null;
   let tab = 'overview';
   let factIndex = 0;
   let globe = null;
   let shareTimer = 0;
+  let quiz = null;
+  let units = initialUnits();
   const coordState = { lat: 0, lng: 0, t: 1 };
 
   /* ------------------------------------------------------------ building */
@@ -126,6 +133,11 @@ export function createUI({ reducedMotion = false } = {}) {
     el.help.addEventListener('click', (e) => { if (e.target === el.help) el.help.close(); }); // backdrop
     $$('[data-close]', el.drawer).forEach((b) => b.addEventListener('click', closeDrawer));
     el.sheetToggle.addEventListener('click', () => setSheet(!el.card.classList.contains('is-expanded')));
+
+    el.timeChip.addEventListener('click', () => handlers.time());
+    el.distance.addEventListener('click', toggleUnits);
+    quiz = createQuiz(el.quiz, { wonders: list, onGo: (i) => handlers.select(i) });
+    el.quizBtn.addEventListener('click', () => { closeDrawer(); quiz.start(); });
 
     el.helpMax.textContent = String(Math.min(9, list.length));
     if (el.globe.getContext) globe = createGlobe(el.globe, { points: list.map((w) => w.coordinates) });
@@ -257,7 +269,10 @@ export function createUI({ reducedMotion = false } = {}) {
   function setDistance() {
     const from = previousData;
     el.distance.hidden = !from;
-    if (from) el.distance.textContent = `${fmtKm(haversineKm(from.coordinates, currentData.coordinates))} from ${from.name}`;
+    if (from) {
+      el.distance.textContent = `${fmtDistance(haversineKm(from.coordinates, currentData.coordinates), units)} from ${from.name}`;
+      el.distance.setAttribute('aria-label', `${el.distance.textContent}. Switch to ${units === 'km' ? 'miles' : 'kilometres'}`);
+    }
   }
 
   /* --------------------------------------------------------------- card */
@@ -286,13 +301,22 @@ export function createUI({ reducedMotion = false } = {}) {
     factIndex = 0;
     showFact(0, false);
 
-    // Visit
+    renderVisit(d);
+
+    // Actions: AR only when there's a model file to place.
+    const m = d.model || {};
+    el.arBtn.hidden = !(m.glb || m.usdz);
+    el.arNote.hidden = true;
+    el.shareNote.hidden = true;
+  }
+
+  function renderVisit(d) {
     const v = d.visit || {};
     const rows = [];
     if (v.nearestCity) rows.push(['Getting there', v.nearestCity]);
     if (v.bestTime) rows.push(['Best time', v.bestTime]);
     if (v.visitors) rows.push(['Visitors', `${v.visitors.value}${v.visitors.year ? ` (${v.visitors.year})` : ''}`]);
-    if (previousData) rows.push([`From ${previousData.name}`, `${fmtKm(haversineKm(previousData.coordinates, d.coordinates))} as the crow flies`]);
+    if (previousData) rows.push([`From ${previousData.name}`, `${fmtDistance(haversineKm(previousData.coordinates, d.coordinates), units)} as the crow flies`]);
     el.visit.innerHTML = rows.map(([k, val]) => `<div><dt>${escapeHTML(k)}</dt><dd>${escapeHTML(val)}</dd></div>`).join('');
     el.visitNote.hidden = !v.note;
     el.visitNote.textContent = v.note || '';
@@ -300,12 +324,32 @@ export function createUI({ reducedMotion = false } = {}) {
       `<li><a href="${escapeHTML(s.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(s.label)}</a></li>`).join('');
     setTabAvailable('visit', rows.length > 0 || !!d.sources?.length);
     if ($(`#tab-${tab}`).hidden) selectTab('overview', { focus: false, animate: false });
+  }
 
-    // Actions: AR only when there's a model file to place.
-    const m = d.model || {};
-    el.arBtn.hidden = !(m.glb || m.usdz);
-    el.arNote.hidden = true;
-    el.shareNote.hidden = true;
+  /* --------------------------------------------------- units & clock */
+
+  function toggleUnits() {
+    units = units === 'km' ? 'mi' : 'km';
+    try { localStorage.setItem('atlas:units', units); } catch { /* private mode */ }
+    setDistance();
+    if (currentData) renderVisit(currentData);
+  }
+
+  /** Local time and light at the wonder; `mode` is 'live' or a preview preset. */
+  function setTime({ local, phase, mode }) {
+    const live = mode === 'live';
+    el.timeChip.dataset.phase = phase.key;
+    el.timeChip.classList.toggle('is-preview', !live);
+    el.timeText.textContent = live
+      ? `${local.text} ${local.solar ? 'solar time' : 'local time'} · ${phase.label}`
+      : `Preview · ${phase.label}`;
+    const next = { live: 'sunrise', sunrise: 'midday', midday: 'sunset', sunset: 'night', night: 'the live sky' }[mode];
+    el.timeChip.title = live
+      ? 'The sky and light follow the real sun at this wonder. Click to preview other times of day.'
+      : `Click for ${next}.`;
+    el.timeChip.setAttribute('aria-label', live
+      ? `${phase.label} at this wonder, ${local.text} local time. Change the time of day`
+      : `Previewing ${phase.label.toLowerCase()}. Change the time of day`);
   }
 
   function setTabAvailable(name, ok) {
@@ -499,7 +543,7 @@ export function createUI({ reducedMotion = false } = {}) {
       if (e.ctrlKey) return;
       const scroller = e.target.closest?.('[data-scrollable]');
       if (scroller && scroller.scrollHeight > scroller.clientHeight + 2) return;
-      if (e.target.closest?.('#drawer, #help')) return;
+      if (e.target.closest?.('#drawer, #help, #quiz')) return;
       e.preventDefault();
       e.stopPropagation(); // keep OrbitControls from zooming on plain scroll
       const now = performance.now();
@@ -514,13 +558,15 @@ export function createUI({ reducedMotion = false } = {}) {
 
     window.addEventListener('keydown', (e) => {
       if (e.target.matches?.('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (el.help.open) return; // the dialog handles its own Escape
+      if (el.help.open || el.quiz.open) return; // dialogs handle their own keys
       if (e.target.closest?.('[role="tablist"]') && /^Arrow|^Home$|^End$/.test(e.key)) return;
       if (e.key === 'Escape') { closeDrawer(); setSheet(false); return; }
       if (e.key === '?') { e.preventDefault(); openHelp(); return; }
       const k = e.key.toLowerCase();
       if (k === 't') return handlers.tour();
       if (k === 'm') return handlers.sound();
+      if (k === 'q') return quiz.start();
+      if (k === 'l') return handlers.time();
       if (k === 'f') { if (tab !== 'facts') selectTab('facts'); else showFact(factIndex + 1, true); return; }
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); handlers.next(); }
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); handlers.prev(); }
@@ -560,7 +606,7 @@ export function createUI({ reducedMotion = false } = {}) {
   return {
     init, setThumbnails, setLoading, hideLoader, showNo3D, showLoaderFact,
     leave, enter, travel, setActive, layoutInsets, closeDrawer,
-    setTour, setSound,
+    setTour, setSound, setTime,
   };
 }
 
@@ -572,8 +618,15 @@ export function haversineKm(a, b) {
   return 2 * R * Math.asin(Math.sqrt(s));
 }
 
-function fmtKm(km) {
-  return `${Math.round(km).toLocaleString('en-GB')} km`;
+function fmtDistance(km, units) {
+  const v = units === 'mi' ? km / 1.609344 : km;
+  return `${Math.round(v).toLocaleString('en-GB')} ${units === 'mi' ? 'miles' : 'km'}`;
+}
+
+/** Remembered choice, else miles where they're the everyday unit. */
+function initialUnits() {
+  try { const u = localStorage.getItem('atlas:units'); if (u === 'km' || u === 'mi') return u; } catch { /* ignore */ }
+  return /^en-(US|GB|LR)$|^my\b/.test(navigator.language || '') ? 'mi' : 'km';
 }
 
 function escapeHTML(s) {

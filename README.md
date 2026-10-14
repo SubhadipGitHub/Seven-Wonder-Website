@@ -6,6 +6,8 @@ It runs immediately with procedural stand-in models. Real `.glb` models drop in 
 
 The Great Pyramid of Giza, given honorary status by the New7Wonders Foundation, comes last in the list and is labelled as honorary rather than numbered.
 
+**The sky is live.** For whichever wonder is on screen, the site works out where the sun is right now and tints that wonder's palette accordingly. You get blue daylight, a warm low sun at golden hour, a violet dusk, and a dark sky full of stars at night. The key light swings round with the sun's bearing and dims to cool moonlight after dark. The headline shows the local time and the phase ("21:50 local time · Night"). Click it, or press `L`, to preview sunrise, midday, sunset or night, then come back to live. `?time=sunrise|midday|sunset|night` opens on a preview. While you stay on one wonder, the sky updates every minute.
+
 Each wonder's card has four tabs: **Overview** (key numbers, context, what to look for, materials), **Timeline** (dated milestones), **Facts** (a deck of facts and debunked myths) and **Visit** (getting there, best season, visitor numbers with their year, distance from the last stop, and sources). A small globe in the headline turns to each site and draws the great-circle route as you travel.
 
 ## Run it
@@ -28,11 +30,13 @@ Useful URL options:
 
 ## Controls
 
-Desktop: scroll wheel, arrow keys, number keys 1–8 or the thumbnail rail to travel. Drag to orbit, Ctrl + scroll (or trackpad pinch) to zoom. Mouse movement tilts the stage. `T` starts or stops the guided tour, `M` toggles sound, `F` shows another fact, `?` lists every shortcut. Inside the card's tab bar, the arrow keys switch tabs instead of travelling.
+Desktop: scroll wheel, arrow keys, number keys 1–8 or the thumbnail rail to travel. Drag to orbit, Ctrl + scroll (or trackpad pinch) to zoom. Mouse movement tilts the stage. `T` starts or stops the guided tour, `M` toggles sound, `F` shows another fact, `L` cycles the time of day, `Q` opens the quiz, `?` lists every shortcut. Inside the card's tab bar, the arrow keys switch tabs instead of travelling.
 
 Mobile: drag to orbit, pinch to zoom, swipe the title left/right to travel, tap the handle or a tab to open the details sheet, menu button for the full list.
 
-Top bar: **play** runs a guided tour (about 9 s per wonder; any navigation of your own, or orbiting, stops it). **Speaker** turns on an ambient wind bed, synthesised with WebAudio, that swells under each transition; it's off by default and the choice is remembered. **Share** in the card uses the system share sheet on phones and copies the deep link elsewhere.
+Top bar: **play** runs a guided tour (about 9 s per wonder; any navigation of your own, or orbiting, stops it). **Speaker** turns on an ambient wind bed, synthesised with WebAudio, that swells under each transition; it's off by default and the choice is remembered. **Share** in the card uses the system share sheet on phones and copies the deep link elsewhere. **Quiz** asks five "Which wonder?" questions drawn from the facts, with the wonder's own names blanked out (`quizAliases` in the data). You can jump to any answer. Click the distance under the headline to switch between km and miles. The default follows your browser's language, and the choice is remembered.
+
+**Offline.** `sw.js` pre-caches the page, data and vendored libraries, so after one visit the atlas opens with no connection. It also installs as an app (`manifest.webmanifest`). Requests go network-first, so an online visit always gets the latest files. Add `?nosw` while editing locally if you'd rather not register the worker at all, and bump `VERSION` in `sw.js` when you add files to its list.
 
 ## Files
 
@@ -50,9 +54,12 @@ js/pointCloud.js         area-weighted surface sampling, seeded PRNG
 js/proceduralWonders.js  the eight primitive-built fallback models
 js/ui.js                 rail, drawer, tabbed card, headline, coordinates, share, input handling
 js/globe.js              orthographic mini globe and great-circle travel arc (2D canvas)
+js/sky.js                solar position, time-of-day sky + light blend, local clock
+js/quiz.js               "Which wonder?" quiz
 js/tour.js               guided-tour timer
 js/audio.js              WebAudio ambience (wind bed + transition swell)
-assets/favicon.svg, assets/og-image.jpg   tab icon and social preview
+sw.js, manifest.webmanifest              offline cache and install metadata
+assets/favicon.svg, icon-192/512.png, og-image.jpg   icons and social preview
 tools/blender_export_wonders.py   batch LOD + Draco export + point clouds from Blender
 docs/BLUEPRINT.md        asset pipeline, architecture, shader walkthrough
 vendor/                  three.js (+ Draco decoder) and GSAP, unmodified
@@ -66,6 +73,8 @@ Everything a wonder shows comes from its entry in `data/wonders.json`. Beyond `i
 
 ```jsonc
 "honorary": true,                       // listed last, labelled instead of numbered
+"timeZone": "Europe/Rome",              // IANA zone for the local clock (sky uses coordinates)
+"quizAliases": ["Colosseum", "…"],      // names blanked out of quiz questions
 "unescoNote": "Listed as part of …",    // shown under the UNESCO year
 "keyStats": [{ "value": "21,196 km", "label": "…" }],      // first one leads; 2–4 work best
 "materials": ["Fired brick", "…"],
