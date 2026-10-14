@@ -1,10 +1,10 @@
 /**
  * proceduralWonders.js
  * ---------------------------------------------------------------------------
- * Out-of-the-box stand-ins for the seven wonders, built only from Three.js
- * primitives (boxes, cylinders, lathes, extrusions). They exist so the site
- * runs immediately; drop a Draco .glb into assets/models/ and point
- * data/wonders.json at it to replace any of them.
+ * Out-of-the-box stand-ins for the seven wonders and the honorary Great
+ * Pyramid, built only from Three.js primitives (boxes, cylinders, lathes,
+ * extrusions). They exist so the site runs immediately; drop a Draco .glb
+ * into assets/models/ and point data/wonders.json at it to replace any of them.
  *
  * Each builder returns a THREE.Group in arbitrary units. finalize() merges
  * every mesh by material (a whole wonder renders in 3–6 draw calls) and
@@ -657,6 +657,34 @@ function tajMahal() {
   return g;
 }
 
+/* ============================================ 8. Great Pyramid (honorary) = */
+
+function greatPyramid() {
+  const g = new THREE.Group();
+  const core = mat('#cfb48a', 0.95);
+  const coreShade = mat('#b89c72', 0.95);
+  const casing = mat('#e2d2b0', 0.8, { flat: true });
+  const sand = mat('#a3825a', 1);
+
+  add(g, cyl(2.45, 2.55, 0.06, 48), sand, { y: -0.03, np: true });
+
+  // Khufu: the casing is gone, so the core reads as fine horizontal courses.
+  // Real proportions: 230.3 m base, 146.6 m high → 2.3 × 1.466 units.
+  const B = 2.3, H = 1.466, courses = 26;
+  const ch = H / courses;
+  for (let i = 0; i < courses; i++) {
+    const w = B * (1 - (i + 0.5) / courses);
+    add(g, box(w, ch * 0.92, w), i % 2 ? core : coreShade, { y: i * ch + ch * 0.46 });
+  }
+  // Capstone stand-in (the real apex is missing — a survey mast marks it).
+  add(g, cyl(0, B / courses / Math.SQRT2 * 1.4, ch * 1.4, 4), casing, { y: H - ch * 0.3, ry: Math.PI / 4 });
+
+  // Three queens' pyramids in a row on the east side, still partly cased.
+  const q = (x, z, b, h) => add(g, cyl(0, b / Math.SQRT2, h, 4), casing, { x, y: h / 2, z, ry: Math.PI / 4 });
+  for (const [z, s] of [[-0.7, 1], [-0.08, 0.96], [0.52, 0.92]]) q(B / 2 + 0.45, z, 0.46 * s, 0.3 * s);
+  return g;
+}
+
 /* ===================================================== public API ======== */
 
 const BUILDERS = {
@@ -667,6 +695,7 @@ const BUILDERS = {
   'chichen-itza': chichenItza,
   colosseum,
   'taj-mahal': tajMahal,
+  'great-pyramid': greatPyramid,
 };
 
 /**

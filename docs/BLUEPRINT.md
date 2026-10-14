@@ -110,8 +110,11 @@ index.html ── import map ─┬─ js/main.js            boot, renderer, lig
                           ├─ js/MorphController.js state machine + GSAP timeline per transition
                           ├─ js/morphShader.js     particle shaders, dissolve patch, dust
                           ├─ js/pointCloud.js      surface sampling, seeded PRNG, cloud resizing
-                          ├─ js/proceduralWonders.js  7 fallback models, merge-by-material, normalise
-                          └─ js/ui.js              DOM: rail, drawer, card, headline, coordinates, input
+                          ├─ js/proceduralWonders.js  8 fallback models, merge-by-material, normalise
+                          ├─ js/ui.js              DOM: rail, drawer, tabbed card, headline, coordinates, input
+                          │   └─ js/globe.js       2D-canvas orthographic globe + great-circle arc
+                          ├─ js/tour.js            guided-tour timer
+                          └─ js/audio.js           WebAudio wind bed + transition swell
 ```
 
 ### Scene graph
@@ -122,7 +125,7 @@ scene
  ├─ ground (ShadowMaterial catcher) · survey ring (LineSegments) · dust (Points)
  └─ pivot ............ mouse-parallax tilt, positioned at the orbit target
      └─ stage ........ slow showcase spin + float
-         ├─ wonder root ×7 (one visible at rest)
+         ├─ wonder root ×8 (one visible at rest)
          └─ morph Points (visible only during transitions)
 ```
 

@@ -5,8 +5,8 @@
  * render loop, resize handling and the model-loading pipeline.
  *
  *   1. detect a quality tier (particle count, DPR cap, shadows)
- *   2. load data/wonders.json and build the UI
- *   3. build the 7 procedural stand-ins → dissolve-patch → sample clouds
+ *   2. load data/wonders.json and build the UI (plus tour + ambience)
+ *   3. build the procedural stand-ins → dissolve-patch → sample clouds
  *   4. render live thumbnails of each model for the rail
  *   5. intro: dust condenses into the first wonder
  *   6. in the background, swap in any Draco .glb models listed in the JSON
@@ -16,7 +16,7 @@
  *    ├─ lights, ground (shadow catcher), survey ring, dust
  *    └─ pivot   (mouse parallax tilt)
  *        └─ stage (slow auto-rotation + float)
- *            ├─ wonder roots ×7 (only the current one visible at rest)
+ *            ├─ wonder roots ×8 (only the current one visible at rest)
  *            └─ morph particles
  * ---------------------------------------------------------------------------
  */
@@ -33,6 +33,8 @@ import { buildProceduralWonder, normalizeModel } from './proceduralWonders.js';
 import { samplePointCloud, fitCount, scatterCloud, mulberry32, seedFrom } from './pointCloud.js';
 import { MorphController } from './MorphController.js';
 import { createUI } from './ui.js';
+import { createTour } from './tour.js';
+import { createAmbience } from './audio.js';
 
 const CONFIG = {
   dataUrl: './data/wonders.json',
@@ -93,6 +95,7 @@ async function boot() {
   if (!res.ok) throw new Error(`Could not load ${CONFIG.dataUrl} (${res.status}). Serve the folder over http — see README.`);
   const data = await res.json();
   const wonders = data.wonders;
+  ui.showLoaderFact(wonders);
 
   const startIndex = Math.max(0, wonders.findIndex((w) => `#${w.id}` === location.hash));
 
@@ -210,13 +213,14 @@ async function boot() {
 
   /* --- UI --------------------------------------------------------------- */
   let controller = null;
-  ui.init(wonders, {
+  const extras = createExtras(() => controller?.next());
+  ui.init(wonders, extras.handlers({
     select: (i) => controller?.goTo(i),
     next: () => controller?.next(),
     prev: () => controller?.prev(),
-  });
+  }));
 
-  /* --- build the seven wonders ----------------------------------------- */
+  /* --- build the wonders ----------------------------------------------- */
   const entries = [];
   for (let i = 0; i < wonders.length; i++) {
     const w = wonders[i];
@@ -266,7 +270,11 @@ async function boot() {
     window.__atlas = { THREE, gsap, scene, camera, renderer, controls, controller, entries, framing, tier: tierName };
   }
   controller.onChange(({ data, phase }) => {
-    if (phase === 'start') history.replaceState(null, '', `#${data.id}`);
+    if (phase === 'start') {
+      history.replaceState(null, '', `#${data.id}`);
+      extras.ambience.swell();
+    }
+    if (phase === 'end') extras.tour.arrived();
   });
 
   function applyTheme(theme, duration) {
@@ -338,7 +346,7 @@ async function boot() {
   document.addEventListener('pointerleave', () => { look.tx = look.ty = 0; });
 
   let interacting = false, resumeAt = 0;
-  controls.addEventListener('start', () => { interacting = true; });
+  controls.addEventListener('start', () => { interacting = true; extras.tour.stop(); });
   controls.addEventListener('end', () => { interacting = false; resumeAt = timer.getElapsed() + 2.5; });
 
   /* --- render loop ------------------------------------------------------ */
@@ -481,6 +489,7 @@ async function loadGLBModels({ renderer, camera, scene, entries, wonders, contro
 function bootWithout3D(wonders, startIndex) {
   ui.showNo3D();
   let current = startIndex;
+  const extras = createExtras(() => show(current + 1));
   const show = (i, dir = 1) => {
     const prev = wonders[current];
     current = ((i % wonders.length) + wonders.length) % wonders.length;
@@ -490,11 +499,47 @@ function bootWithout3D(wonders, startIndex) {
     document.documentElement.style.setProperty('--accent', w.theme.accent);
     ui.travel(prev, w, 0.01);
     ui.enter(w, current, dir);
+    history.replaceState(null, '', `#${w.id}`);
+    extras.tour.arrived();
   };
-  ui.init(wonders, { select: (i) => show(i), next: () => show(current + 1), prev: () => show(current - 1, -1) });
+  ui.init(wonders, extras.handlers({ select: (i) => show(i), next: () => show(current + 1), prev: () => show(current - 1, -1) }));
   ui.travel(null, wonders[current], 0.01);
   show(current);
   ui.hideLoader();
+}
+
+/* ---------------------------------------------------------------- extras */
+
+/**
+ * Guided tour and ambient sound. Any navigation the user makes themselves
+ * stops the tour; the tour's own steps go straight to `advance`.
+ */
+function createExtras(advance) {
+  const ambience = createAmbience();
+  const tour = createTour({ advance, onState: ui.setTour });
+  if (ambience.remembered) {
+    // Audio needs a gesture: honour a remembered "on" at the first click or key.
+    ui.setSound(true);
+    const arm = () => {
+      removeEventListener('pointerdown', arm, true);
+      removeEventListener('keydown', arm, true);
+      ambience.set(true);
+    };
+    addEventListener('pointerdown', arm, true);
+    addEventListener('keydown', arm, true);
+  }
+  const user = (fn) => (...args) => { tour.stop(); fn(...args); };
+  return {
+    tour,
+    ambience,
+    handlers: (nav) => ({
+      select: user(nav.select),
+      next: user(nav.next),
+      prev: user(nav.prev),
+      tour: () => tour.toggle(),
+      sound: () => ui.setSound(ambience.toggle()),
+    }),
+  };
 }
 
 /* ---------------------------------------------------------------- helpers */
